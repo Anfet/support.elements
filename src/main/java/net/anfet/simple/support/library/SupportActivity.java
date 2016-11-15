@@ -159,7 +159,7 @@ public abstract class SupportActivity extends AppCompatActivity {
 	}
 
 	public View getRoot() {
-		return super.getWindow().getDecorView().getRootView();
+		return super.getWindow().findViewById(android.R.id.content);
 	}
 
 

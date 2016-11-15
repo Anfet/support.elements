@@ -36,6 +36,17 @@ public abstract class InflatedPresenter<T> implements IFontedPresenter<T, Recycl
 		this.clickListener = clickListener;
 	}
 
+	@Nullable
+	@Override
+	public String getFont() {
+		Font font = getClass().getAnnotation(Font.class);
+		if (font != null) {
+			return font.value();
+		}
+
+		return null;
+	}
+
 	public void setClickListener(@Nullable IClickListener<T> clickListener) {
 		this.clickListener = clickListener;
 	}

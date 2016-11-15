@@ -13,6 +13,7 @@ public abstract class UiRunner extends Runner {
 	private final Handler handler;
 	private final Object publishLock = new Object();
 	private volatile boolean ran = true;
+	private Throwable error;
 
 	@MainThread
 	public UiRunner(Object owner) {
@@ -30,23 +31,37 @@ public abstract class UiRunner extends Runner {
 		});
 	}
 
+	@Override
+	protected void onPublishFinished() {
+		try {
+			if (error == null) {
+				onPostExecute();
+			}
+		} finally {
+			onFinished();
+		}
+	}
+
 	/**
 	 * запускает обновление прогресса если оно еще не сделано
 	 */
 	public final void schedulePublishProgress() {
-		synchronized (this) {
-			if (isRuninng()) {
-				if (ran) {
-					ran = false;
-					handler.post(new Runnable() {
-						@Override
-						public void run() {
+		final UiRunner synch = this;
+		if (ran) {
+			ran = false;
+			handler.post(new Runnable() {
+				@Override
+				public void run() {
+					if (isRuninng()) {
+						synchronized (synch) {
 							onPublishProgress();
-							ran = true;
 						}
-					});
+					}
+
+					ran = true;
 				}
-			}
+
+			});
 		}
 	}
 
@@ -76,6 +91,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishError(final Throwable ex) {
+		error = ex;
 		handler.post(new Runnable() {
 			@Override
 			public void run() {

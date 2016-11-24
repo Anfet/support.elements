@@ -19,6 +19,7 @@ import junit.framework.Assert;
 import net.anfet.simple.support.library.anotations.ActivityTransitition;
 import net.anfet.simple.support.library.anotations.Font;
 import net.anfet.simple.support.library.anotations.Layout;
+import net.anfet.simple.support.library.anotations.Root;
 import net.anfet.simple.support.library.exceptions.NoIdException;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
 import net.anfet.simple.support.library.inflation.InflateHelper;
@@ -33,6 +34,7 @@ import java.util.List;
  */
 public abstract class SupportActivity extends AppCompatActivity {
 
+	private View mRoot = null;
 	private List<BroadcastReceiver> registeredReceivers;
 	private List<BroadcastReceiver> registeredGlovalReceivers;
 
@@ -64,6 +66,14 @@ public abstract class SupportActivity extends AppCompatActivity {
 		}
 
 		setContentView(getLayoutId());
+		if (getClass().isAnnotationPresent(Root.class)) {
+			mRoot = findViewById(getClass().getAnnotation(Root.class).value());
+		}
+
+		if (getRoot() == null) {
+			throw new NullPointerException("No root specified for " + getClass().getSimpleName());
+		}
+
 
 		if (!(getRoot() instanceof CoordinatorLayout) && !(getRoot() instanceof FrameLayout))
 			Log.v(SupportActivity.class.getSimpleName(), "Root is recommended as Coordinator/Frame Layouts");
@@ -158,8 +168,8 @@ public abstract class SupportActivity extends AppCompatActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-	public View getRoot() {
-		return super.getWindow().findViewById(android.R.id.content);
+	public final View getRoot() {
+		return mRoot;
 	}
 
 

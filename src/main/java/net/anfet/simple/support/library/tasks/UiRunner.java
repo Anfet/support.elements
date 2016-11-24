@@ -5,6 +5,8 @@ import android.support.annotation.MainThread;
 
 import net.anfet.tasks.Runner;
 
+import java.util.concurrent.CountDownLatch;
+
 /**
  * Раннер предназначенный для выполнения задач и выдачу результатов в UI поток. Обязательно должен вызываться в UI потоке
  */
@@ -13,7 +15,6 @@ public abstract class UiRunner extends Runner {
 	private final Handler handler;
 	private final Object publishLock = new Object();
 	private volatile boolean ran = true;
-	private Throwable error;
 
 	@MainThread
 	public UiRunner(Object owner) {
@@ -23,24 +24,40 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishFinished() {
+		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override
 			public void run() {
-				onPublishFinished();
+				onFinished();
+				latch.countDown();
 			}
 		});
+
+		try {
+			latch.await();
+		} catch (InterruptedException ignored) {
+			//it's ok if thread gets interrupted
+		}
 	}
 
 	@Override
-	protected void onPublishFinished() {
-		try {
-			if (error == null) {
+	protected void publishPostExecute() {
+		final CountDownLatch latch = new CountDownLatch(1);
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
 				onPostExecute();
+				latch.countDown();
 			}
-		} finally {
-			onFinished();
+		});
+
+		try {
+			latch.await();
+		} catch (InterruptedException ignored) {
+			//it's ok if thread gets interrupted
 		}
 	}
+
 
 	/**
 	 * запускает обновление прогресса если оно еще не сделано
@@ -91,13 +108,20 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishError(final Throwable ex) {
-		error = ex;
+		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override
 			public void run() {
 				onError(ex);
+				latch.countDown();
 			}
 		});
+
+		try {
+			latch.await();
+		} catch (InterruptedException ignored) {
+			//it's ok if thread gets interrupted
+		}
 	}
 
 	@MainThread

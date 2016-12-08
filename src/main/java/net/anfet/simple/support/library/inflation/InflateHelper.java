@@ -16,8 +16,10 @@ import android.widget.TextView;
 import net.anfet.simple.support.library.anotations.ClickHandler;
 import net.anfet.simple.support.library.anotations.Font;
 import net.anfet.simple.support.library.anotations.InflatableFragment;
+import net.anfet.simple.support.library.anotations.InflatableGroup;
 import net.anfet.simple.support.library.anotations.InflatableView;
 import net.anfet.simple.support.library.anotations.MultiActionLocalReceiver;
+import net.anfet.simple.support.library.anotations.RadioGroup;
 import net.anfet.simple.support.library.anotations.SingleActionGlobalReceiver;
 import net.anfet.simple.support.library.anotations.SingleActionLocalReceiver;
 import net.anfet.simple.support.library.anotations.Underline;
@@ -42,7 +44,7 @@ public final class InflateHelper {
 	 * @param fragmentManagerV4 - фрагмент менеджер
 	 * @param lowestSuperclass  - самый верхний парент, ниже которого нет смысла лезть
 	 */
-	public static void injectViewsAndFragments(final Object target, IRootWrapper root, FragmentManager fragmentManagerV4, Class lowestSuperclass) {
+	public static final void injectViewsAndFragments(final Object target, IRootWrapper root, FragmentManager fragmentManagerV4, Class lowestSuperclass) {
 		List<Field> fields = ReflectionSupport.getFields(target.getClass(), lowestSuperclass);
 		for (Field field : fields) {
 			field.setAccessible(true);
@@ -65,6 +67,27 @@ public final class InflateHelper {
 							}
 						}
 					}
+
+					continue;
+				}
+
+				InflatableGroup inflatableGroup = field.getAnnotation(InflatableGroup.class);
+				if (inflatableGroup != null) {
+					InflatableViewGroup viewGroup = new InflatableViewGroup();
+					for (Integer i : inflatableGroup.value()) {
+						viewGroup.addView(root.findViewById(i));
+					}
+					field.set(target, viewGroup);
+					continue;
+				}
+
+				RadioGroup radioGroup = field.getAnnotation(RadioGroup.class);
+				if (radioGroup != null) {
+					RadioViewGroup viewGroup = new RadioViewGroup();
+					for (Integer i : radioGroup.value()) {
+						viewGroup.addView(root.findViewById(i));
+					}
+					field.set(target, viewGroup);
 					continue;
 				}
 

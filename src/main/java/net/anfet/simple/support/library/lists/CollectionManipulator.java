@@ -13,7 +13,7 @@ import java.util.List;
  * Фильтр для любых коллекций
  */
 
-public class CollectionManipulator<T extends Object> {
+public class CollectionManipulator<T> {
 
 	private final List<IFilter<T>> filters;
 	private Comparator<T> comparator;
@@ -22,7 +22,7 @@ public class CollectionManipulator<T extends Object> {
 		filters = new LinkedList<>();
 	}
 
-	public static <X extends Object> Collection<X> getItems(Collection<X> items, IFilter<X> filter) {
+	public static <X> Collection<X> getItems(Collection<X> items, IFilter<X> filter) {
 		return new CollectionManipulator<X>().addFilter(filter).getItems(items);
 	}
 

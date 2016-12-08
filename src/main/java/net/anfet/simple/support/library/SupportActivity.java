@@ -10,6 +10,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -45,6 +46,16 @@ public abstract class SupportActivity extends AppCompatActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setHomeButtonEnabled(true);
 		getSupportActionBar().setTitle("");
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		net.anfet.simple.support.library.anotations.Menu menuAnnotation = getClass().getAnnotation(net.anfet.simple.support.library.anotations.Menu.class);
+		if (menuAnnotation != null) {
+			getMenuInflater().inflate(menuAnnotation.value(), menu);
+		}
+
+		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override

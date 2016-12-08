@@ -19,6 +19,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class ListHolderAdapter<T extends Object> extends HolderAdapter<T> {
 
+	public static final IListViewIterator ALL = new IListViewIterator<Object>() {
+		@Override
+		public boolean onView(View view, Object item) {
+			return true;
+		}
+	};
+
+
 	protected final List<T> items;
 	protected final AtomicBoolean requireUpdate;
 	protected Comparator<T> comparator;

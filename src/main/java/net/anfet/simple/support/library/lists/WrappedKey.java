@@ -4,7 +4,7 @@ package net.anfet.simple.support.library.lists;
  * Суррогатный ключ
  */
 
-public abstract class WrappedKey<T extends Object> implements Key {
+public abstract class WrappedKey<T> implements Key {
 	private final T value;
 
 

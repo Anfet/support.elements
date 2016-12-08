@@ -28,6 +28,9 @@ public final class Dates {
 	public static final SimpleDateFormat yyyyMMddHHmmss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 	public static final SimpleDateFormat ddMMMMHHmm = new SimpleDateFormat("dd MMMM HH:mm", Locale.getDefault());
 	public static final SimpleDateFormat ddEEEHHmm = new SimpleDateFormat("dd EEE HH:mm", Locale.getDefault());
+	public static final SimpleDateFormat DDMMYYYY = new SimpleDateFormat("dd.MM.yyyy");
+	public static final SimpleDateFormat ddMMMMyyyy = new SimpleDateFormat("dd MMMM yyyy");
+
 
 	public static List<Date> makeList(Date from, Date till) {
 		Calendar cycle = Calendar.getInstance();
@@ -97,5 +100,18 @@ public final class Dates {
 		long sec = msec / MSEC_IN_SEC;
 		msec -= sec * MSEC_IN_SEC;
 		return String.format(Locale.US, "%02d:%02d", h, min);
+	}
+
+	public static boolean isToday(Date date) {
+		return truncateTime(new Date()).equals(truncateTime(date));
+	}
+
+	public static boolean isYesterday(Date date) {
+		Calendar a = Calendar.getInstance();
+		a.setTime(truncateTime(a.getTime()));
+		Calendar b = Calendar.getInstance();
+		b.setTime(truncateTime(date));
+		a.add(Calendar.DAY_OF_MONTH, -1);
+		return a.getTime().equals(b.getTime());
 	}
 }

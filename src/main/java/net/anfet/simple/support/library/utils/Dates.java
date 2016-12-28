@@ -28,8 +28,9 @@ public final class Dates {
 	public static final SimpleDateFormat yyyyMMddHHmmss = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 	public static final SimpleDateFormat ddMMMMHHmm = new SimpleDateFormat("dd MMMM HH:mm", Locale.getDefault());
 	public static final SimpleDateFormat ddEEEHHmm = new SimpleDateFormat("dd EEE HH:mm", Locale.getDefault());
-	public static final SimpleDateFormat DDMMYYYY = new SimpleDateFormat("dd.MM.yyyy");
-	public static final SimpleDateFormat ddMMMMyyyy = new SimpleDateFormat("dd MMMM yyyy");
+	public static final SimpleDateFormat DDMMYYYY = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+	public static final SimpleDateFormat ddMMMMyyyy = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+	public static final SimpleDateFormat ddMMMyyyy = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
 
 
 	public static List<Date> makeList(Date from, Date till) {
@@ -51,20 +52,31 @@ public final class Dates {
 
 	public static Date truncateDate(Date date) {
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		calendar.set(Calendar.YEAR, 0);
-		calendar.set(Calendar.MONTH, 0);
-		calendar.set(Calendar.DAY_OF_MONTH, 0);
+		calendar.setTimeInMillis(date.getTime());
+
+		int h = calendar.get(Calendar.HOUR_OF_DAY);
+		int m = calendar.get(Calendar.MINUTE);
+		int s = calendar.get(Calendar.SECOND);
+		int ms = calendar.get(Calendar.MILLISECOND);
+		calendar.setTimeInMillis(0);
+		calendar.set(Calendar.HOUR_OF_DAY, h);
+		calendar.set(Calendar.MINUTE, m);
+		calendar.set(Calendar.SECOND, s);
+		calendar.set(Calendar.MILLISECOND, ms);
 		return calendar.getTime();
 	}
 
 	public static Date truncateTime(Date date) {
 		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		calendar.set(Calendar.HOUR_OF_DAY, 0);
-		calendar.set(Calendar.MINUTE, 0);
-		calendar.set(Calendar.SECOND, 0);
-		calendar.set(Calendar.MILLISECOND, 0);
+		calendar.setTimeInMillis(date.getTime());
+
+		int y = calendar.get(Calendar.YEAR);
+		int m = calendar.get(Calendar.MONTH);
+		int d = calendar.get(Calendar.DAY_OF_MONTH);
+		calendar.setTimeInMillis(0);
+		calendar.set(Calendar.YEAR, y);
+		calendar.set(Calendar.MONTH, m);
+		calendar.set(Calendar.DAY_OF_MONTH, d);
 		return calendar.getTime();
 	}
 

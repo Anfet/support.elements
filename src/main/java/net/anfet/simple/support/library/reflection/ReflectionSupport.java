@@ -1,6 +1,6 @@
 package net.anfet.simple.support.library.reflection;
 
-import net.anfet.tasks.ConcurrentMultiMap;
+import net.anfet.MultiMap;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -15,8 +15,8 @@ import java.util.List;
 public final class ReflectionSupport {
 
 
-	private static final ConcurrentMultiMap<Class, Field> fields = new ConcurrentMultiMap<>();
-	private static final ConcurrentMultiMap<Class, Method> methods = new ConcurrentMultiMap<>();
+	private static final MultiMap<Class, Field> fields = new MultiMap<>();
+	private static final MultiMap<Class, Method> methods = new MultiMap<>();
 
 
 	/**

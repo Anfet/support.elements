@@ -3,17 +3,14 @@ package net.anfet.simple.support.library;
 import android.content.BroadcastReceiver;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 
 import junit.framework.Assert;
 
@@ -67,6 +64,10 @@ public abstract class SupportActivity extends AppCompatActivity {
 		}
 	}
 
+	public int getRootId() {
+		throw new NoIdException("No root id specified");
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -79,15 +80,13 @@ public abstract class SupportActivity extends AppCompatActivity {
 		setContentView(getLayoutId());
 		if (getClass().isAnnotationPresent(Root.class)) {
 			mRoot = findViewById(getClass().getAnnotation(Root.class).value());
+		} else {
+			mRoot = findViewById(getRootId());
 		}
 
 		if (getRoot() == null) {
 			throw new NullPointerException("No root specified for " + getClass().getSimpleName());
 		}
-
-
-		if (!(getRoot() instanceof CoordinatorLayout) && !(getRoot() instanceof FrameLayout))
-			Log.v(SupportActivity.class.getSimpleName(), "Root is recommended as Coordinator/Frame Layouts");
 
 		Fonts.setFont(getRoot(), getFont());
 		InflateHelper.injectViewsAndFragments(this, getRoot(), getSupportFragmentManager(), SupportActivity.class);

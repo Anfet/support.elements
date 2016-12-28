@@ -94,7 +94,7 @@ public abstract class SupportFragment extends DialogFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		if (getClass().isAnnotationPresent(Alert.class)) {
+		if (getClass().isAnnotationPresent(Alert.class) || getClass().isAnnotationPresent(NoLayout.class)) {
 			return super.onCreateView(inflater, container, savedInstanceState);
 		}
 

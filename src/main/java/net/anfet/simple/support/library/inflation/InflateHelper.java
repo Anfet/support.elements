@@ -18,6 +18,7 @@ import net.anfet.simple.support.library.anotations.Font;
 import net.anfet.simple.support.library.anotations.InflatableFragment;
 import net.anfet.simple.support.library.anotations.InflatableGroup;
 import net.anfet.simple.support.library.anotations.InflatableView;
+import net.anfet.simple.support.library.anotations.LongClickHandler;
 import net.anfet.simple.support.library.anotations.MultiActionLocalReceiver;
 import net.anfet.simple.support.library.anotations.RadioGroup;
 import net.anfet.simple.support.library.anotations.SingleActionGlobalReceiver;
@@ -130,6 +131,32 @@ public final class InflateHelper {
 							} catch (InvocationTargetException e) {
 								e.printStackTrace();
 							}
+						}
+					});
+				}
+			}
+
+			LongClickHandler handler = method.getAnnotation(LongClickHandler.class);
+			if (handler != null) {
+				for (int id : handler.value()) {
+					final View view = root.findViewById(id);
+					if (view == null) {
+						Log.e(InflateHelper.class.getSimpleName(), "Some id not found for long click method: " + method.getName());
+						continue;
+					}
+
+					view.setOnLongClickListener(new View.OnLongClickListener() {
+
+						@Override
+						public boolean onLongClick(View view) {
+							try {
+								return (boolean) method.invoke(target, view);
+							} catch (IllegalAccessException e) {
+								e.printStackTrace();
+							} catch (InvocationTargetException e) {
+								e.printStackTrace();
+							}
+							return false;
 						}
 					});
 				}

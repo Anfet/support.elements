@@ -6,8 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import net.anfet.simple.support.library.anotations.Layout;
 import net.anfet.simple.support.library.anotations.Font;
+import net.anfet.simple.support.library.anotations.Layout;
 import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.inflation.ViewRootWrapper;
 import net.anfet.simple.support.library.utils.Fonts;
@@ -43,6 +43,7 @@ abstract class HolderAdapter<T> extends BaseAdapter {
 
 	public void populateView(View root, T t, int position) {
 		InflateHelper.injectViewsAndFragments(this, new ViewRootWrapper(root), null, getClass());
+		InflateHelper.registerSimpleHandlers(this, root, getClass());
 	}
 
 	@Override

@@ -266,7 +266,7 @@ public class LookupList<T extends Key> implements Collection<T> {
 
 	@NonNull
 	public List<T> list() {
-		return new LinkedList<>(list);
+		return new LinkedList<>(items());
 	}
 
 	@NonNull

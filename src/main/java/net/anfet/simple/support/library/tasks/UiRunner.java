@@ -13,7 +13,6 @@ import java.util.concurrent.CountDownLatch;
 public abstract class UiRunner extends Runner {
 
 	private final Handler handler;
-	private final Object publishLock = new Object();
 	private volatile boolean ran = true;
 
 	@MainThread
@@ -62,19 +61,13 @@ public abstract class UiRunner extends Runner {
 	/**
 	 * запускает обновление прогресса если оно еще не сделано
 	 */
-	public final void schedulePublishProgress() {
-		final UiRunner synch = this;
+	protected final void schedulePublishProgress() {
 		if (ran) {
 			ran = false;
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					if (isRuninng()) {
-						synchronized (synch) {
-							onPublishProgress();
-						}
-					}
-
+					onPublishProgress();
 					ran = true;
 				}
 
@@ -87,23 +80,16 @@ public abstract class UiRunner extends Runner {
 	 * @throws InterruptedException
 	 */
 	protected final void publishProgress() throws InterruptedException {
-		synchronized (this) {
-			if (isRuninng()) {
-				synchronized (publishLock) {
-					handler.post(new Runnable() {
-						@Override
-						public void run() {
-							onPublishProgress();
-							synchronized (publishLock) {
-								publishLock.notifyAll();
-							}
-						}
-					});
-
-					publishLock.wait();
-				}
+		final CountDownLatch latch = new CountDownLatch(1);
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				onPublishProgress();
+				latch.countDown();
 			}
-		}
+		});
+
+		latch.await();
 	}
 
 	@Override
@@ -125,7 +111,7 @@ public abstract class UiRunner extends Runner {
 	}
 
 	@MainThread
-	public void onPublishProgress() {
+	protected void onPublishProgress() {
 
 	}
 }

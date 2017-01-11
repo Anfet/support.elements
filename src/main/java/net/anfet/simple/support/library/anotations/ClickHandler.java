@@ -14,4 +14,5 @@ import java.lang.annotation.Target;
 @Target(value = ElementType.METHOD)
 public @interface ClickHandler {
 	@IdRes int[] value();
+	boolean required() default false;
 }

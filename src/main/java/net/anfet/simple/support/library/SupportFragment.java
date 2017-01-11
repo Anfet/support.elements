@@ -2,7 +2,6 @@ package net.anfet.simple.support.library;
 
 import android.app.Dialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -11,7 +10,6 @@ import android.support.annotation.StyleRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +78,14 @@ public abstract class SupportFragment extends DialogFragment {
 		throw new NoLayoutException();
 	}
 
+	protected void inflateLayoutIntoBuilder(AlertDialog.Builder builder) {
+		mRoot = LayoutInflater.from(builder.getContext()).inflate(getLayoutId(), null, false);
+		InflateHelper.injectViewsAndFragments(this, mRoot, null, getClass());
+		InflateHelper.registerSimpleHandlers(this, mRoot, getClass());
+
+		builder.setView(mRoot);
+	}
+
 	/**
 	 * Вызывается после того как форму распаковали, заинжектили поля и выставили шрифты
 	 */
@@ -109,22 +115,16 @@ public abstract class SupportFragment extends DialogFragment {
 		return 0;
 	}
 
-
-	@Override
-	public Context getContext() {
-		if (getStyleRes() == 0) return super.getContext();
-		return new ContextThemeWrapper(super.getContext(), getStyleRes());
-	}
-
 	@NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		if (getClass().isAnnotationPresent(Alert.class)) {
+
 			AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), getStyleRes());
-			mRoot = LayoutInflater.from(builder.getContext()).inflate(getLayoutId(), null, false);
+			inflateLayoutIntoBuilder(builder);
 			onAfterInflate(savedInstanceState);
-			builder.setView(mRoot);
-			return onSetupDialog(builder);
+
+			return onSetupDialog(builder, savedInstanceState);
 		} else {
 			return super.onCreateDialog(savedInstanceState);
 		}
@@ -158,7 +158,7 @@ public abstract class SupportFragment extends DialogFragment {
 	 * @param builder билдер
 	 * @return диалог для возврата в создание фрагмента
 	 */
-	protected Dialog onSetupDialog(AlertDialog.Builder builder) {
+	protected Dialog onSetupDialog(AlertDialog.Builder builder, Bundle savedInstanceState) {
 		return builder.create();
 	}
 }

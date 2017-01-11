@@ -17,4 +17,6 @@ import java.lang.annotation.Target;
  */
 public @interface InflatableView {
 	@IdRes int value();
+
+	boolean required() default false;
 }

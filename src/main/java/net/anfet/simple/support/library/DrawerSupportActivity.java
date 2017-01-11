@@ -84,9 +84,7 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		onPreDrawerInit();
-
 		initDrawer();
-
 	}
 
 	private void initDrawer() {
@@ -109,7 +107,7 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 
 				public void onDrawerOpened(View drawerView) {
 					super.onDrawerOpened(drawerView);
-					invalidateOptionsMenu();
+					DrawerSupportActivity.this.supportInvalidateOptionsMenu();
 					DrawerSupportActivity.this.onDrawerOpened();
 				}
 			};

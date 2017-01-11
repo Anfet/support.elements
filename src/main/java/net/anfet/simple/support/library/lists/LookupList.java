@@ -16,7 +16,9 @@ import java.util.Map;
 
 /**
  * Отсортированный список объектов объектов забэкованный с помощью списка и карты, позволяющий быстро искать элементы как по интексу, так и по ключу
+ * {@see Keys}
  */
+@Deprecated
 public class LookupList<T extends Key> implements Collection<T> {
 
 	private List<T> list = new LinkedList<>();

@@ -67,6 +67,10 @@ public final class InflateHelper {
 								Fonts.underline(view);
 							}
 						}
+					} else {
+						if (viewNotation.required()) {
+							throw new AssertionError("Required view: " + field.getName() + " not found");
+						}
 					}
 
 					continue;
@@ -96,7 +100,6 @@ public final class InflateHelper {
 					InflatableFragment fragmentNotation = field.getAnnotation(InflatableFragment.class);
 					if (fragmentNotation != null) {
 						field.set(target, fragmentManagerV4.findFragmentById(fragmentNotation.value()));
-						continue;
 					}
 				}
 			} catch (IllegalAccessException e) {
@@ -117,7 +120,11 @@ public final class InflateHelper {
 				for (int id : clickHandler.value()) {
 					final View view = root.findViewById(id);
 					if (view == null) {
-						Log.e(InflateHelper.class.getSimpleName(), "Some id not found click method: " + method.getName());
+						if (clickHandler.required()) {
+							throw new AssertionError("Some id not found for click method: " + method.getName());
+						}
+
+						Log.e(InflateHelper.class.getSimpleName(), "Some id not found for click method: " + method.getName());
 						continue;
 					}
 
@@ -214,9 +221,9 @@ public final class InflateHelper {
 						try {
 							method.invoke(target, context, intent, this);
 						} catch (IllegalAccessException e) {
-							e.printStackTrace();
+							throw new RuntimeException(e.getMessage(), e);
 						} catch (InvocationTargetException e) {
-							e.printStackTrace();
+							throw new RuntimeException(e.getMessage(), e);
 						}
 					}
 				};
@@ -240,9 +247,9 @@ public final class InflateHelper {
 						try {
 							method.invoke(target, context, intent, this);
 						} catch (IllegalAccessException e) {
-							e.printStackTrace();
+							throw new RuntimeException(e.getMessage(), e);
 						} catch (InvocationTargetException e) {
-							e.printStackTrace();
+							throw new RuntimeException(e.getMessage(), e);
 						}
 					}
 				};

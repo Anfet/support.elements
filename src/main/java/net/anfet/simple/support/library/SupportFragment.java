@@ -11,6 +11,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -80,10 +81,19 @@ public abstract class SupportFragment extends DialogFragment {
 
 	protected void inflateLayoutIntoBuilder(AlertDialog.Builder builder) {
 		mRoot = LayoutInflater.from(builder.getContext()).inflate(getLayoutId(), null, false);
-		InflateHelper.injectViewsAndFragments(this, mRoot, null, getClass());
-		InflateHelper.registerSimpleHandlers(this, mRoot, getClass());
+//		InflateHelper.injectViewsAndFragments(this, mRoot, null, getClass());
+//		InflateHelper.registerSimpleHandlers(this, mRoot, getClass());
 
 		builder.setView(mRoot);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(android.view.Menu menu, MenuInflater inflater) {
+		if (getClass().isAnnotationPresent(Menu.class)) {
+			Menu notation = getClass().getAnnotation(Menu.class);
+			inflater.inflate(notation.value(), menu);
+		}
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 
 	/**
@@ -137,7 +147,8 @@ public abstract class SupportFragment extends DialogFragment {
 	@Override
 	public void onPause() {
 		for (BroadcastReceiver receiver : broadcastReceivers) {
-			LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(receiver);
+			LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
+			getContext().unregisterReceiver(receiver);
 		}
 
 		broadcastReceivers = null;

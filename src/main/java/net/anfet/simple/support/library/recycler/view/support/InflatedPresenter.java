@@ -76,9 +76,8 @@ public abstract class InflatedPresenter<T> implements IFontedPresenter<T, Recycl
 
 
 	@Override
-	public void populateView(@NonNull Context context, @NonNull RecycleViewHolder<T> holder, @NonNull final T t, final int position) {
+	public void populateView(@NonNull Context context, @NonNull RecycleViewHolder<T> holder, @Nullable final T t, final int position) {
 		Assert.assertNotNull(holder);
-		Assert.assertNotNull(t);
 		InflateHelper.injectViewsAndFragments(this, holder.itemView, null, getClass());
 
 		if ((getClickableFlags() & FLAG_ITEMS_CLICKABLE) > 0) {

@@ -74,6 +74,11 @@ public class Imploder {
 		return ret;
 	}
 
+	@Override
+	public String toString() {
+		return getString();
+	}
+
 	public Imploder add(Object item) {
 		items.add(item);
 		return this;

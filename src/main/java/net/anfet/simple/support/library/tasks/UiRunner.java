@@ -2,6 +2,7 @@ package net.anfet.simple.support.library.tasks;
 
 import android.os.Handler;
 import android.support.annotation.MainThread;
+import android.util.Log;
 
 import net.anfet.tasks.Runner;
 
@@ -62,6 +63,8 @@ public abstract class UiRunner extends Runner {
 	 * запускает обновление прогресса если оно еще не сделано
 	 */
 	protected final void schedulePublishProgress() {
+		if (!alive()) return;
+
 		if (ran) {
 			ran = false;
 			handler.post(new Runnable() {
@@ -80,6 +83,8 @@ public abstract class UiRunner extends Runner {
 	 * @throws InterruptedException
 	 */
 	protected final void publishProgress() throws InterruptedException {
+		if (!alive()) return;
+
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override
@@ -94,6 +99,8 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishError(final Throwable ex) {
+		Log.e(getClass().getName(), ex.getMessage(), ex);
+
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override

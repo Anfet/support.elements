@@ -11,8 +11,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
+import net.anfet.simple.support.library.anotations.AdapterItemClickHandler;
 import net.anfet.simple.support.library.anotations.ClickHandler;
 import net.anfet.simple.support.library.anotations.Font;
 import net.anfet.simple.support.library.anotations.InflatableFragment;
@@ -21,11 +23,11 @@ import net.anfet.simple.support.library.anotations.InflatableView;
 import net.anfet.simple.support.library.anotations.LongClickHandler;
 import net.anfet.simple.support.library.anotations.MultiActionLocalReceiver;
 import net.anfet.simple.support.library.anotations.RadioGroup;
-import net.anfet.simple.support.library.anotations.SingleActionGlobalReceiver;
 import net.anfet.simple.support.library.anotations.SingleActionLocalReceiver;
 import net.anfet.simple.support.library.anotations.Underline;
 import net.anfet.simple.support.library.reflection.ReflectionSupport;
 import net.anfet.simple.support.library.utils.Fonts;
+import net.anfet.simple.support.library.wrappers.WrapperAdapterClickListener;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -168,43 +170,31 @@ public final class InflateHelper {
 					});
 				}
 			}
-		}
-	}
 
-	/**
-	 * регистрирует глобальные ресиверы для контекста
-	 * @param target           цель
-	 * @param context          контекст
-	 * @param lowestSuperclass нижний суперкласс для проверки
-	 * @return список зарегистрированных ресиверов
-	 */
-	public static List<BroadcastReceiver> registerGlobalReceivers(final Object target, Context context, Class lowestSuperclass) {
-		List<BroadcastReceiver> receivers = new LinkedList<>();
-		List<Method> methods = ReflectionSupport.getMethods(target.getClass(), lowestSuperclass);
-		for (final Method method : methods) {
-			method.setAccessible(true);
+			AdapterItemClickHandler itemClickHandler = method.getAnnotation(AdapterItemClickHandler.class);
+			if (itemClickHandler != null) {
+				final View view = root.findViewById(itemClickHandler.value());
+				if (view == null) {
+					Log.e(InflateHelper.class.getSimpleName(), "Some id not found for AdapterItemClickHandler click method: " + method.getName());
+					continue;
+				}
 
-			SingleActionGlobalReceiver globalReceiver = method.getAnnotation(SingleActionGlobalReceiver.class);
-			if (globalReceiver != null) {
-				BroadcastReceiver receiver = new BroadcastReceiver() {
-					@Override
-					public void onReceive(Context context, Intent intent) {
-						try {
-							method.invoke(target, context, intent, this);
-						} catch (IllegalAccessException e) {
-							e.printStackTrace();
-						} catch (InvocationTargetException e) {
-							e.printStackTrace();
+				if (view instanceof AdapterView) {
+					((AdapterView) view).setOnItemClickListener(new WrapperAdapterClickListener<Object>() {
+						@Override
+						public void onItemClick(Object item) {
+							try {
+								method.invoke(target, item);
+							} catch (IllegalAccessException e) {
+								e.printStackTrace();
+							} catch (InvocationTargetException e) {
+								e.printStackTrace();
+							}
 						}
-					}
-				};
-
-				receivers.add(receiver);
-				context.registerReceiver(receiver, new IntentFilter(globalReceiver.value()));
+					});
+				}
 			}
 		}
-
-		return receivers;
 	}
 
 	public static final List<BroadcastReceiver> registerLocalReceivers(final Object target, Context context, Class lowestSuperclass) {
@@ -229,6 +219,7 @@ public final class InflateHelper {
 				};
 
 				receivers.add(receiver);
+				context.registerReceiver(receiver, new IntentFilter(annotation.value()));
 				LocalBroadcastManager.getInstance(context).registerReceiver(receiver, new IntentFilter(annotation.value()));
 			}
 
@@ -256,8 +247,8 @@ public final class InflateHelper {
 
 				receivers.add(receiver);
 				LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
+				context.registerReceiver(receiver, filter);
 			}
-
 		}
 
 		return receivers;

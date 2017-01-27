@@ -79,4 +79,5 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 
 		notifyDataSetChanged();
 	}
+
 }

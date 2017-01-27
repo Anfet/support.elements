@@ -34,7 +34,7 @@ public abstract class SupportActivity extends AppCompatActivity {
 
 	private View mRoot = null;
 	private List<BroadcastReceiver> registeredReceivers;
-	private List<BroadcastReceiver> registeredGlovalReceivers;
+//	private List<BroadcastReceiver> registeredGlovalReceivers;
 
 	public void initToolbar(@NonNull Toolbar toolbar) {
 		Assert.assertNotNull(toolbar);
@@ -151,21 +151,24 @@ public abstract class SupportActivity extends AppCompatActivity {
 	protected void onResume() {
 		super.onResume();
 		registeredReceivers = InflateHelper.registerLocalReceivers(this, this, getClass());
-		registeredGlovalReceivers = InflateHelper.registerGlobalReceivers(this, this, getClass());
+//		registeredGlovalReceivers = InflateHelper.registerGlobalReceivers(this, this, getClass());
 	}
 
 	@Override
 	protected void onPause() {
 		Tasks.forfeitAllFor(this);
-		for (BroadcastReceiver receiver : registeredReceivers)
+		for (BroadcastReceiver receiver : registeredReceivers) {
 			LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-
-		for (BroadcastReceiver receiver : registeredGlovalReceivers) {
 			unregisterReceiver(receiver);
 		}
 
+
+//		for (BroadcastReceiver receiver : registeredGlovalReceivers) {
+//			unregisterReceiver(receiver);
+//		}
+
 		registeredReceivers = null;
-		registeredGlovalReceivers = null;
+//		registeredGlovalReceivers = null;
 		super.onPause();
 	}
 

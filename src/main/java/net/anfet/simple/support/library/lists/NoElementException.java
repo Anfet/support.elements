@@ -12,4 +12,8 @@ public class NoElementException extends Exception {
 	public NoElementException() {
 
 	}
+
+	public NoElementException(Class<?> type, Integer id) {
+		super("No element " + type.getSimpleName() + ":" + String.valueOf(id));
+	}
 }

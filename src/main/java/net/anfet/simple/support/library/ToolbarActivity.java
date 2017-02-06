@@ -10,6 +10,7 @@ import net.anfet.simple.support.library.exceptions.NoIdException;
 
 /**
  * Активити с {@link Toolbar}
+ * для работы либо оверрайднуть {@link #getToolbarId()} либо проставить {@link WithToolbar} нотацию
  */
 
 public class ToolbarActivity extends SupportActivity {

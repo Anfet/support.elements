@@ -23,11 +23,7 @@ import java.text.ParseException;
  */
 public class SupportGson {
 	public static final Gson get() {
-		GsonBuilder builder = new GsonBuilder();
-
-		builder.registerTypeAdapter(Time.class, new TimeSerializer());
-		builder.registerTypeAdapter(Timestamp.class, new TimestampSerializer());
-		return builder.create();
+		return getBuilder().create();
 	}
 
 	public static final GsonBuilder getBuilder() {

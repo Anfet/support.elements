@@ -24,6 +24,8 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishFinished() {
+		if (!alive()) return;
+
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override
@@ -42,6 +44,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishPostExecute() {
+		if (!alive()) return;
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override
@@ -99,6 +102,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishError(final Throwable ex) {
+		if (!alive()) return;
 		Log.e(getClass().getName(), ex.getMessage(), ex);
 
 		final CountDownLatch latch = new CountDownLatch(1);

@@ -1,15 +1,15 @@
 package net.anfet.simple.support.library;
 
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StyleRes;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -21,11 +21,12 @@ import net.anfet.simple.support.library.anotations.Layout;
 import net.anfet.simple.support.library.anotations.Menu;
 import net.anfet.simple.support.library.anotations.NoLayout;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
+import net.anfet.simple.support.library.inflation.DetachableBroadcastReceiver;
 import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.utils.Fonts;
 import net.anfet.tasks.Tasks;
 
-import java.util.List;
+import java.util.Collection;
 
 
 /**
@@ -40,7 +41,7 @@ public abstract class SupportFragment extends DialogFragment {
 	/**
 	 * Список бродкастов для дерегистрации
 	 */
-	private List<BroadcastReceiver> broadcastReceivers;
+	private Collection<DetachableBroadcastReceiver> broadcastReceivers;
 
 	public SupportFragment() {
 
@@ -145,14 +146,25 @@ public abstract class SupportFragment extends DialogFragment {
 	}
 
 	@Override
-	public void onPause() {
-		for (BroadcastReceiver receiver : broadcastReceivers) {
-			LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(receiver);
-			getContext().unregisterReceiver(receiver);
-		}
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		Log.v(getClass().getSimpleName(), "attached");
+	}
 
-		broadcastReceivers = null;
+	@Override
+	public void onDetach() {
+		Log.v(getClass().getSimpleName(), "detached");
+		super.onDetach();
+	}
+
+	@Override
+	public void onPause() {
+		Log.v(getClass().getSimpleName(), "paused");
+
 		Tasks.forfeitAllFor(this);
+		InflateHelper.detachReceivers(getActivity(), broadcastReceivers);
+		broadcastReceivers = null;
+
 		super.onPause();
 	}
 

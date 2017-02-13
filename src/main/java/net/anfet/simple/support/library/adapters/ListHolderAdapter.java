@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -61,7 +62,7 @@ public class ListHolderAdapter<T extends Object> extends HolderAdapter<T> {
 			requireUpdate.set(false);
 		}
 
-		return items;
+		return new LinkedList<>(items);
 	}
 
 	public ListHolderAdapter<T> setItems(Collection<T> items) {

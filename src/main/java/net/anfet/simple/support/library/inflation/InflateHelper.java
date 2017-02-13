@@ -1,8 +1,6 @@
 package net.anfet.simple.support.library.inflation;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.ColorRes;
 import android.support.annotation.Nullable;
@@ -32,14 +30,20 @@ import net.anfet.simple.support.library.wrappers.WrapperAdapterClickListener;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by Oleg on 12.07.2016.
+ *
+ * Помошник для распаковки объектов
  */
 public final class InflateHelper {
 
+
+	private static final Object mAttachLock = new Object();
+	
 	/**
 	 * Инжектит найденные {@link InflatableView} и {@link InflatableFragment} в {@param target}.
 	 * @param target            - цель
@@ -197,30 +201,19 @@ public final class InflateHelper {
 		}
 	}
 
-	public static final List<BroadcastReceiver> registerLocalReceivers(final Object target, Context context, Class lowestSuperclass) {
-		List<BroadcastReceiver> receivers = new LinkedList<>();
+	public static Collection<DetachableBroadcastReceiver> registerLocalReceivers(final Object target, Context context, Class lowestSuperclass) {
+		List<DetachableBroadcastReceiver> receivers = new LinkedList<>();
 		List<Method> methods = ReflectionSupport.getMethods(target.getClass(), lowestSuperclass);
 		for (final Method method : methods) {
 			method.setAccessible(true);
 
 			SingleActionLocalReceiver annotation = method.getAnnotation(SingleActionLocalReceiver.class);
 			if (annotation != null) {
-				BroadcastReceiver receiver = new BroadcastReceiver() {
-					@Override
-					public void onReceive(Context context, Intent intent) {
-						try {
-							method.invoke(target, context, intent, this);
-						} catch (IllegalAccessException e) {
-							throw new RuntimeException(e.getMessage(), e);
-						} catch (InvocationTargetException e) {
-							throw new RuntimeException(e.getMessage(), e);
-						}
-					}
-				};
-
+				DetachableBroadcastReceiver receiver = new DetachableBroadcastReceiver(method, target);
 				receivers.add(receiver);
 				context.registerReceiver(receiver, new IntentFilter(annotation.value()));
 				LocalBroadcastManager.getInstance(context).registerReceiver(receiver, new IntentFilter(annotation.value()));
+				receiver.attach();
 			}
 
 
@@ -232,22 +225,11 @@ public final class InflateHelper {
 					filter.addAction(action);
 				}
 
-				BroadcastReceiver receiver = new BroadcastReceiver() {
-					@Override
-					public void onReceive(Context context, Intent intent) {
-						try {
-							method.invoke(target, context, intent, this);
-						} catch (IllegalAccessException e) {
-							throw new RuntimeException(e.getMessage(), e);
-						} catch (InvocationTargetException e) {
-							throw new RuntimeException(e.getMessage(), e);
-						}
-					}
-				};
-
+				DetachableBroadcastReceiver receiver = new DetachableBroadcastReceiver(method, target);
 				receivers.add(receiver);
 				LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
 				context.registerReceiver(receiver, filter);
+				receiver.attach();
 			}
 		}
 
@@ -273,6 +255,14 @@ public final class InflateHelper {
 				View child = vg.getChildAt(i);
 				setTextColor(context, child, plainTextColor);
 			}
+		}
+	}
+
+	public static void detachReceivers(Context context, Collection<DetachableBroadcastReceiver> receivers) {
+		for (DetachableBroadcastReceiver receiver : receivers) {
+			receiver.detach();
+			LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
+			context.unregisterReceiver(receiver);
 		}
 	}
 }

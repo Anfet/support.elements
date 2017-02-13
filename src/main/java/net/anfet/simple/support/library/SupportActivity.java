@@ -1,11 +1,9 @@
 package net.anfet.simple.support.library;
 
-import android.content.BroadcastReceiver;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -20,11 +18,12 @@ import net.anfet.simple.support.library.anotations.Layout;
 import net.anfet.simple.support.library.anotations.Root;
 import net.anfet.simple.support.library.exceptions.NoIdException;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
+import net.anfet.simple.support.library.inflation.DetachableBroadcastReceiver;
 import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.utils.Fonts;
 import net.anfet.tasks.Tasks;
 
-import java.util.List;
+import java.util.Collection;
 
 
 /**
@@ -33,8 +32,7 @@ import java.util.List;
 public abstract class SupportActivity extends AppCompatActivity {
 
 	private View mRoot = null;
-	private List<BroadcastReceiver> registeredReceivers;
-//	private List<BroadcastReceiver> registeredGlovalReceivers;
+	private Collection<DetachableBroadcastReceiver> registeredReceivers;
 
 	public void initToolbar(@NonNull Toolbar toolbar) {
 		Assert.assertNotNull(toolbar);
@@ -151,24 +149,13 @@ public abstract class SupportActivity extends AppCompatActivity {
 	protected void onResume() {
 		super.onResume();
 		registeredReceivers = InflateHelper.registerLocalReceivers(this, this, getClass());
-//		registeredGlovalReceivers = InflateHelper.registerGlobalReceivers(this, this, getClass());
 	}
 
 	@Override
 	protected void onPause() {
 		Tasks.forfeitAllFor(this);
-		for (BroadcastReceiver receiver : registeredReceivers) {
-			LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver);
-			unregisterReceiver(receiver);
-		}
-
-
-//		for (BroadcastReceiver receiver : registeredGlovalReceivers) {
-//			unregisterReceiver(receiver);
-//		}
-
+		InflateHelper.detachReceivers(this, registeredReceivers);
 		registeredReceivers = null;
-//		registeredGlovalReceivers = null;
 		super.onPause();
 	}
 

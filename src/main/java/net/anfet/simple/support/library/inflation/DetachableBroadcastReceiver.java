@@ -4,8 +4,12 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.firebase.crash.FirebaseCrash;
+import com.google.gson.Gson;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Locale;
 
 /**
  * Created by Oleg on 13.02.2017.
@@ -40,9 +44,10 @@ public class DetachableBroadcastReceiver extends BroadcastReceiver {
 			try {
 				method.invoke(target, context, intent, this);
 			} catch (IllegalAccessException e) {
-				throw new AssertionError(e.getMessage());
+				FirebaseCrash.report(e);
 			} catch (InvocationTargetException e) {
-				throw new AssertionError(e.getMessage());
+				FirebaseCrash.log(String.format(Locale.US, "Crash from: %s; intent: %s; data: %s", String.valueOf(target), intent.getAction(), new Gson().toJson(intent)));
+				FirebaseCrash.report(e);
 			}
 		}
 	}

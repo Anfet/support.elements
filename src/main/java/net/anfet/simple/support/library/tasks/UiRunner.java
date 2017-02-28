@@ -24,7 +24,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishFinished() {
-		if (!alive()) return;
+		if (getState() == FORFEITED) return;
 
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
@@ -44,7 +44,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishPostExecute() {
-		if (!alive()) return;
+		if (getState() == FORFEITED) return;
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override
@@ -66,7 +66,7 @@ public abstract class UiRunner extends Runner {
 	 * запускает обновление прогресса если оно еще не сделано
 	 */
 	protected final void schedulePublishProgress() {
-		if (!alive()) return;
+		if (getState() == Runner.FORFEITED) return;
 
 		if (ran) {
 			ran = false;
@@ -86,7 +86,7 @@ public abstract class UiRunner extends Runner {
 	 * @throws InterruptedException
 	 */
 	protected final void publishProgress() throws InterruptedException {
-		if (!alive()) return;
+		if (getState() == FORFEITED) return;
 
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
@@ -102,7 +102,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishError(final Throwable ex) {
-		if (!alive()) return;
+		if (getState() == FORFEITED) return;
 		Log.e(getClass().getName(), ex.getMessage(), ex);
 
 		final CountDownLatch latch = new CountDownLatch(1);

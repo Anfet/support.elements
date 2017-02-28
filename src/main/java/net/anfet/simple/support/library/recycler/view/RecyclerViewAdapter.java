@@ -13,6 +13,8 @@ import net.anfet.simple.support.library.recycler.view.support.RecycleViewHolder;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Queue;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * Враппер для адаптера
@@ -24,6 +26,7 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 	private final Context context;
 	private final LinkedList<T> items;
 	private final IPresenter presenter;
+	private final Queue<RecycleViewHolder<T>> pool;
 
 	public RecyclerViewAdapter(@NonNull Context context, @Nullable Collection<T> items, @NonNull IPresenter presenter) {
 		Assert.assertNotNull(context);
@@ -36,12 +39,18 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 
 		Assert.assertNotNull(presenter);
 		this.presenter = presenter;
+
+		this.pool = new SynchronousQueue<>();
 	}
 
 
 	@Override
 	public RecycleViewHolder<T> onCreateViewHolder(ViewGroup parent, int viewType) {
-		return presenter.getNewViewHolder(context, parent);
+		RecycleViewHolder<T> holder = pool.poll();
+		if (holder == null) {
+			holder = presenter.getNewViewHolder(context, parent);
+		}
+		return holder;
 	}
 
 	@Override
@@ -80,4 +89,7 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 		notifyDataSetChanged();
 	}
 
+	public void releaseViewHolder(RecycleViewHolder<T> holder) {
+		if (!pool.contains(holder)) pool.offer(holder);
+	}
 }

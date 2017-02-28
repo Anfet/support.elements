@@ -74,6 +74,16 @@ public abstract class InflatedPresenter<T> implements IFontedPresenter<T, Recycl
 		throw new NoLayoutException();
 	}
 
+	/**
+	 * очищает форму
+	 * @param context контекст
+	 * @param holder держатель
+	 * @param t элемент
+	 * @param position позиция
+	 */
+	public void reset(@NonNull Context context, @NonNull RecycleViewHolder<T> holder, @Nullable final T t, final int position) {
+
+	}
 
 	@Override
 	public void populateView(@NonNull Context context, @NonNull RecycleViewHolder<T> holder, @Nullable final T t, final int position) {

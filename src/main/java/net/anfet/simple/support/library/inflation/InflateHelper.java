@@ -60,19 +60,24 @@ public final class InflateHelper {
 				if (viewNotation != null) {
 					View view = root.findViewById(viewNotation.value());
 					if (view != null) {
-						field.set(target, view);
+						try {
+							field.set(target, view);
+							if (view instanceof TextView) {
+								Font fontNotation = field.getAnnotation(Font.class);
+								if (fontNotation != null) {
+									String fontName = fontNotation.value();
+									Fonts.setFont(view, fontName);
+								}
 
-						if (view instanceof TextView) {
-							Font fontNotation = field.getAnnotation(Font.class);
-							if (fontNotation != null) {
-								String fontName = fontNotation.value();
-								Fonts.setFont(view, fontName);
+								if (field.getAnnotation(Underline.class) != null) {
+									Fonts.underline(view);
+								}
 							}
-
-							if (field.getAnnotation(Underline.class) != null) {
-								Fonts.underline(view);
-							}
+						} catch (IllegalArgumentException ex) {
+							Log.e(InflateHelper.class.getName(), "Illegal class assignment: " + ex.getMessage(), ex);
 						}
+
+
 					} else {
 						if (viewNotation.required()) {
 							throw new AssertionError("Required view: " + field.getName() + " not found");

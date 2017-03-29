@@ -23,6 +23,34 @@ public abstract class UiRunner extends Runner {
 	}
 
 	@Override
+	protected void publishPreExecute() throws Exception {
+		if (getState() == FORFEITED) return;
+
+		final Exception[] exception = {null};
+		final CountDownLatch latch = new CountDownLatch(1);
+		handler.post(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					onPreExecute();
+				} catch (Exception e) {
+					exception[0] = e;
+				}
+
+				latch.countDown();
+			}
+		});
+
+		if (exception[0] != null) throw exception[0];
+
+		try {
+			latch.await();
+		} catch (InterruptedException ignored) {
+			//it's ok if thread gets interrupted
+		}
+	}
+
+	@Override
 	protected void publishFinished() {
 		if (getState() == FORFEITED) return;
 

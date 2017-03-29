@@ -49,6 +49,7 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 		RecycleViewHolder<T> holder = pool.poll();
 		if (holder == null) {
 			holder = presenter.getNewViewHolder(context, parent);
+			presenter.initHolder(holder);
 		}
 		return holder;
 	}

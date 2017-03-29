@@ -13,6 +13,7 @@ import net.anfet.simple.support.library.exceptions.NoIdException;
 import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.inflation.ViewRootWrapper;
 import net.anfet.simple.support.library.utils.Fonts;
+import net.anfet.simple.support.library.utils.IBackpressPropagator;
 
 
 /**
@@ -32,6 +33,9 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 	 * внутренности {@link DrawerLayout}
 	 */
 	protected View drawerView;
+
+	private IBackpressPropagator mBackPressPropagator = null;
+	private boolean shouldProcessBack = false;
 
 	/**
 	 * @return - идентификатор самого дравера
@@ -98,6 +102,7 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 		getSupportActionBar().setHomeButtonEnabled(true);
 
 		if (isToggleEnabled()) {
+
 			drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, 0, 0) {
 
 				public void onDrawerClosed(View view) {
@@ -112,7 +117,7 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 				}
 			};
 
-			drawerLayout.setDrawerListener(drawerToggle);
+			restoreDrawerHamburger();
 		}
 
 		drawerView = getDrawerView();
@@ -178,5 +183,30 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 
 	protected void onDrawerClosed() {
 
+	}
+
+	@Override
+	public void onBackPressed() {
+		shouldProcessBack = true;
+		if (mBackPressPropagator != null) {
+			shouldProcessBack = !mBackPressPropagator.onBackButtonPressed();
+			if (!shouldProcessBack) return;
+		}
+
+		super.onBackPressed();
+	}
+
+	public boolean shouldProcessBack() {
+		return shouldProcessBack;
+	}
+
+	public void suppressDrawerHamburger(IBackpressPropagator iBackpressPropagator) {
+		mBackPressPropagator = iBackpressPropagator;
+		drawerLayout.setDrawerListener(null);
+	}
+
+	public void restoreDrawerHamburger() {
+		mBackPressPropagator = null;
+		drawerLayout.setDrawerListener(drawerToggle);
 	}
 }

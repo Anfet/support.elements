@@ -15,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import junit.framework.Assert;
+
 import net.anfet.simple.support.library.anotations.Alert;
 import net.anfet.simple.support.library.anotations.Font;
 import net.anfet.simple.support.library.anotations.Layout;
@@ -78,6 +80,11 @@ public abstract class SupportFragment extends DialogFragment {
 		}
 
 		throw new NoLayoutException();
+	}
+
+	public SupportActivity getSupportActivity() {
+		Assert.assertTrue(getActivity() instanceof SupportActivity);
+		return (SupportActivity) getActivity();
 	}
 
 	protected void inflateLayoutIntoBuilder(AlertDialog.Builder builder) {

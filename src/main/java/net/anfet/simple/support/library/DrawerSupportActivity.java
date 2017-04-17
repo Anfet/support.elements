@@ -15,6 +15,9 @@ import net.anfet.simple.support.library.inflation.ViewRootWrapper;
 import net.anfet.simple.support.library.utils.Fonts;
 import net.anfet.simple.support.library.utils.IBackpressPropagator;
 
+import java.util.LinkedList;
+import java.util.List;
+
 
 /**
  * Класс поддержки для {@link SupportActivity} у которых присуствует {@link DrawerLayout} навигационный дравер
@@ -34,7 +37,7 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 	 */
 	protected View drawerView;
 
-	private IBackpressPropagator mBackPressPropagator = null;
+	private final List<IBackpressPropagator> mBackPressPropagators = new LinkedList<>();
 	private boolean shouldProcessBack = false;
 
 	/**
@@ -117,7 +120,7 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 				}
 			};
 
-			restoreDrawerHamburger();
+			drawerLayout.setDrawerListener(drawerToggle);
 		}
 
 		drawerView = getDrawerView();
@@ -188,9 +191,13 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 	@Override
 	public void onBackPressed() {
 		shouldProcessBack = true;
-		if (mBackPressPropagator != null) {
-			shouldProcessBack = !mBackPressPropagator.onBackButtonPressed();
-			if (!shouldProcessBack) return;
+		synchronized (mBackPressPropagators) {
+			for (IBackpressPropagator propagator : mBackPressPropagators) {
+				if (propagator.onBackButtonPressed()) {
+					shouldProcessBack = false;
+					return;
+				}
+			}
 		}
 
 		super.onBackPressed();
@@ -200,13 +207,17 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 		return shouldProcessBack;
 	}
 
-	public void suppressDrawerHamburger(IBackpressPropagator iBackpressPropagator) {
-		mBackPressPropagator = iBackpressPropagator;
-		drawerLayout.setDrawerListener(null);
+
+	public void addBackpressPropagator(IBackpressPropagator propagator) {
+		synchronized (mBackPressPropagators) {
+			mBackPressPropagators.add(propagator);
+		}
 	}
 
-	public void restoreDrawerHamburger() {
-		mBackPressPropagator = null;
-		drawerLayout.setDrawerListener(drawerToggle);
+	public void removeBackpressPropagator(IBackpressPropagator propagator) {
+		synchronized (mBackPressPropagators) {
+			mBackPressPropagators.remove(propagator);
+		}
 	}
+
 }

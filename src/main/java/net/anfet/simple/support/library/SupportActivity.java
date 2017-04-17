@@ -21,9 +21,12 @@ import net.anfet.simple.support.library.exceptions.NoLayoutException;
 import net.anfet.simple.support.library.inflation.DetachableBroadcastReceiver;
 import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.utils.Fonts;
+import net.anfet.simple.support.library.utils.IBackpressPropagator;
 import net.anfet.tasks.Tasks;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -33,6 +36,9 @@ public abstract class SupportActivity extends AppCompatActivity {
 
 	private View mRoot = null;
 	private Collection<DetachableBroadcastReceiver> registeredReceivers;
+
+	private final List<IBackpressPropagator> mBackPressPropagators = new LinkedList<>();
+	private boolean shouldProcessBack = false;
 
 	public void initToolbar(@NonNull Toolbar toolbar) {
 		Assert.assertNotNull(toolbar);
@@ -55,7 +61,18 @@ public abstract class SupportActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
+		shouldProcessBack = true;
+		synchronized (mBackPressPropagators) {
+			for (IBackpressPropagator propagator : mBackPressPropagators) {
+				if (propagator.onBackButtonPressed()) {
+					shouldProcessBack = false;
+					return;
+				}
+			}
+		}
+
 		super.onBackPressed();
+
 		ActivityTransitition activityTransitition = getClass().getAnnotation(ActivityTransitition.class);
 		if (activityTransitition != null) {
 			overridePendingTransition(activityTransitition.in(), activityTransitition.out());
@@ -172,5 +189,21 @@ public abstract class SupportActivity extends AppCompatActivity {
 		return mRoot;
 	}
 
+	public boolean shouldProcessBack() {
+		return shouldProcessBack;
+	}
+
+
+	public void addBackpressPropagator(IBackpressPropagator propagator) {
+		synchronized (mBackPressPropagators) {
+			mBackPressPropagators.add(propagator);
+		}
+	}
+
+	public void removeBackpressPropagator(IBackpressPropagator propagator) {
+		synchronized (mBackPressPropagators) {
+			mBackPressPropagators.remove(propagator);
+		}
+	}
 
 }

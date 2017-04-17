@@ -13,10 +13,6 @@ import net.anfet.simple.support.library.exceptions.NoIdException;
 import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.inflation.ViewRootWrapper;
 import net.anfet.simple.support.library.utils.Fonts;
-import net.anfet.simple.support.library.utils.IBackpressPropagator;
-
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**
@@ -37,8 +33,7 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 	 */
 	protected View drawerView;
 
-	private final List<IBackpressPropagator> mBackPressPropagators = new LinkedList<>();
-	private boolean shouldProcessBack = false;
+
 
 	/**
 	 * @return - идентификатор самого дравера
@@ -188,36 +183,6 @@ public abstract class DrawerSupportActivity extends ToolbarActivity {
 
 	}
 
-	@Override
-	public void onBackPressed() {
-		shouldProcessBack = true;
-		synchronized (mBackPressPropagators) {
-			for (IBackpressPropagator propagator : mBackPressPropagators) {
-				if (propagator.onBackButtonPressed()) {
-					shouldProcessBack = false;
-					return;
-				}
-			}
-		}
 
-		super.onBackPressed();
-	}
-
-	public boolean shouldProcessBack() {
-		return shouldProcessBack;
-	}
-
-
-	public void addBackpressPropagator(IBackpressPropagator propagator) {
-		synchronized (mBackPressPropagators) {
-			mBackPressPropagators.add(propagator);
-		}
-	}
-
-	public void removeBackpressPropagator(IBackpressPropagator propagator) {
-		synchronized (mBackPressPropagators) {
-			mBackPressPropagators.remove(propagator);
-		}
-	}
 
 }

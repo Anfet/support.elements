@@ -72,6 +72,17 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 		}
 	}
 
+	public void removeItem(T item) {
+		synchronized (items) {
+			int idx = items.indexOf(item);
+			if (idx > -1) {
+				items.remove(item);
+			}
+
+			notifyItemRemoved(idx);
+		}
+	}
+
 	@NonNull
 	public Collection<T> getItems() {
 		synchronized (items) {
@@ -92,5 +103,30 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 
 	public void releaseViewHolder(RecycleViewHolder<T> holder) {
 		if (!pool.contains(holder)) pool.offer(holder);
+	}
+
+	public void addItems(T... objects) {
+		synchronized (this.items) {
+			for (T object : objects) {
+				addItem(object);
+			}
+		}
+	}
+
+	private void addItem(T object) {
+		synchronized (this.items) {
+			items.add(object);
+		}
+
+		notifyItemInserted(items.size() - 1);
+	}
+
+	public void notifyItemChanged(T object) {
+		synchronized (items) {
+			int idx = items.indexOf(object);
+			if (idx > -1) {
+				notifyItemChanged(idx);
+			}
+		}
 	}
 }

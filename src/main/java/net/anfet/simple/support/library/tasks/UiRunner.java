@@ -5,8 +5,11 @@ import android.support.annotation.MainThread;
 import android.util.Log;
 
 import net.anfet.tasks.Runner;
+import net.anfet.tasks.RunnerState;
 
 import java.util.concurrent.CountDownLatch;
+
+import static net.anfet.tasks.RunnerState.FORFEITED;
 
 /**
  * Раннер предназначенный для выполнения задач и выдачу результатов в UI поток. Обязательно должен вызываться в UI потоке
@@ -24,7 +27,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishPreExecute() throws Exception {
-		if (getState() == FORFEITED) return;
+		if (state == RunnerState.FORFEITED) return;
 
 		final Exception[] exception = {null};
 		final CountDownLatch latch = new CountDownLatch(1);
@@ -52,7 +55,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishFinished() {
-		if (getState() == FORFEITED) return;
+		if (state == FORFEITED) return;
 
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
@@ -72,7 +75,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishPostExecute() {
-		if (getState() == FORFEITED) return;
+		if (state == FORFEITED) return;
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
 			@Override
@@ -94,7 +97,7 @@ public abstract class UiRunner extends Runner {
 	 * запускает обновление прогресса если оно еще не сделано
 	 */
 	protected final void schedulePublishProgress() {
-		if (getState() == Runner.FORFEITED) return;
+		if (state == RunnerState.FORFEITED) return;
 
 		if (ran) {
 			ran = false;
@@ -114,7 +117,7 @@ public abstract class UiRunner extends Runner {
 	 * @throws InterruptedException
 	 */
 	protected final void publishProgress() throws InterruptedException {
-		if (getState() == FORFEITED) return;
+		if (state == FORFEITED) return;
 
 		final CountDownLatch latch = new CountDownLatch(1);
 		handler.post(new Runnable() {
@@ -130,7 +133,7 @@ public abstract class UiRunner extends Runner {
 
 	@Override
 	protected void publishError(final Throwable ex) {
-		if (getState() == FORFEITED) return;
+		if (state == FORFEITED) return;
 		Log.e(getClass().getName(), ex.getMessage(), ex);
 
 		final CountDownLatch latch = new CountDownLatch(1);

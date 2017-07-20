@@ -38,7 +38,6 @@ public abstract class SupportActivity extends AppCompatActivity {
 	private Collection<DetachableBroadcastReceiver> registeredReceivers;
 
 	private final List<IBackpressPropagator> mBackPressPropagators = new LinkedList<>();
-	private boolean shouldProcessBack = false;
 
 	public void initToolbar(@NonNull Toolbar toolbar) {
 		Assert.assertNotNull(toolbar);
@@ -61,16 +60,6 @@ public abstract class SupportActivity extends AppCompatActivity {
 
 	@Override
 	public void onBackPressed() {
-		shouldProcessBack = true;
-		synchronized (mBackPressPropagators) {
-			for (IBackpressPropagator propagator : mBackPressPropagators) {
-				if (propagator.onBackButtonPressed()) {
-					shouldProcessBack = false;
-					return;
-				}
-			}
-		}
-
 		super.onBackPressed();
 
 		ActivityTransitition activityTransitition = getClass().getAnnotation(ActivityTransitition.class);
@@ -189,10 +178,22 @@ public abstract class SupportActivity extends AppCompatActivity {
 		return mRoot;
 	}
 
-	public boolean shouldProcessBack() {
-		return shouldProcessBack;
-	}
 
+	/**
+	 * функция может быть вызвана чтобы понять нужно ли выполнять действие назад
+	 * @return true, если все пропагаторы сказали ок - false, если кто-то сказал нет. пропагаторы сами ответственны за обработку действий
+	 */
+	public boolean canExecuteBackButton() {
+		synchronized (mBackPressPropagators) {
+			for (IBackpressPropagator propagator : mBackPressPropagators) {
+				if (!propagator.shouldGoBack()) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
 
 	public void addBackpressPropagator(IBackpressPropagator propagator) {
 		synchronized (mBackPressPropagators) {

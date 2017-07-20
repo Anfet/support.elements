@@ -63,6 +63,7 @@ public abstract class InflatedPresenter<T> implements IFontedPresenter<T, Recycl
 		}
 
 		InflateHelper.registerSimpleHandlers(this, holder.itemView, getClass());
+		InflateHelper.injectViewsAndFragments(this, holder.itemView, null, getClass());
 	}
 
 	@Override

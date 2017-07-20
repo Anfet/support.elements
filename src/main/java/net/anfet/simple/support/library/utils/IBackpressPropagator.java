@@ -12,5 +12,5 @@ public interface IBackpressPropagator {
 	 * передает нажатие кнопки назад
 	 * @return true если событие обработано, false если нет
 	 */
-	boolean onBackButtonPressed();
+	boolean shouldGoBack();
 }

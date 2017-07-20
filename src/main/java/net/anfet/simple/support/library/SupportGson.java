@@ -22,11 +22,11 @@ import java.text.ParseException;
  * Gson поддержки для встраивания нужных классов
  */
 public class SupportGson {
-	public static final Gson get() {
+	public static synchronized Gson get() {
 		return getBuilder().create();
 	}
 
-	public static final GsonBuilder getBuilder() {
+	public static synchronized GsonBuilder getBuilder() {
 		GsonBuilder builder = new GsonBuilder();
 
 		builder.registerTypeAdapter(Time.class, new TimeSerializer());

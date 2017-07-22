@@ -1,21 +1,19 @@
 package net.anfet.simple.support.library.utils;
 
-import net.anfet.simple.support.library.reflection.ReflectionSupport;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
-public class Imploder {
+public final class Imploder {
 
-	private List<Object> items;
+	private Collection<Object> items;
 	private String separator;
 
 	public Imploder(String separator) {
-		this.items = new ArrayList<Object>();
+		this.items = new LinkedList<>();
 		this.separator = separator;
 	}
 
@@ -35,26 +33,6 @@ public class Imploder {
 		for (Iterator<?> i = iterable.iterator(); i.hasNext(); ) {
 			Object o = i.next();
 			ret += o.toString() + (i.hasNext() ? separator : "");
-		}
-
-		return ret;
-	}
-
-	public static String implodeUsingField(Iterable<?> iterable, String separator, String field) {
-		String ret = "";
-		for (Iterator<?> i = iterable.iterator(); i.hasNext(); ) {
-			Object o = i.next();
-			try {
-				Field f = ReflectionSupport.findField(o.getClass(), field, Object.class);
-				if (f != null) {
-					ret += String.valueOf(f.get(o)) + (i.hasNext() ? separator : "");
-				} else {
-					throw new RuntimeException("Invalid field " + field + " in class " + o.getClass().getName());
-				}
-
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
 		}
 
 		return ret;

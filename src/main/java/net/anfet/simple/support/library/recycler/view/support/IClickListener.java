@@ -9,6 +9,4 @@ import android.view.View;
 
 public interface IClickListener<T> {
 	boolean onItemClicked(@NonNull View view, @NonNull T t, int position);
-
-	boolean onLongItemClicked(@NonNull View view, @NonNull T t, int position);
 }

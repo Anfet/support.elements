@@ -18,12 +18,10 @@ public final class SupportAuthorization {
 
 	private static SupportAuthorization instance;
 
-	private Context context;
-	private SharedPreferences preferences;
+	private final SharedPreferences preferences;
 	private LoginMap map;
 
 	private SupportAuthorization(Context context) {
-		this.context = context;
 		preferences = context.getSharedPreferences(SupportAuthorization.class.getSimpleName(), Context.MODE_PRIVATE);
 		try {
 			String value = preferences.getString(SupportAuthorization.class.getSimpleName(), null);

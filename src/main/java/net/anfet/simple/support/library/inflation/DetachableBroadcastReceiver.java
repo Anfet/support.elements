@@ -3,7 +3,6 @@ package net.anfet.simple.support.library.inflation;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 import com.google.gson.Gson;
@@ -44,18 +43,15 @@ public class DetachableBroadcastReceiver extends BroadcastReceiver {
 		if (state == ReceiverState.ATTACHED) {
 			try {
 				method.invoke(target, context, intent, this);
-			} catch (IllegalAccessException e) {
-				FirebaseCrash.report(e);
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException e) {
 				FirebaseCrash.log(String.format(Locale.US, "Crash from: %s; intent: %s; data: %s", String.valueOf(target), intent.getAction(), new Gson().toJson(intent)));
 				FirebaseCrash.report(e);
-				Log.e(getClass().getName(), e.getMessage(), e);
 			}
 		}
 	}
 
 
-	public enum ReceiverState {
+	private enum ReceiverState {
 		ATTACHED, DETACHED;
 	}
 }

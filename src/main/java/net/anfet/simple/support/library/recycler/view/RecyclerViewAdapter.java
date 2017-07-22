@@ -6,8 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
-import junit.framework.Assert;
-
 import net.anfet.simple.support.library.recycler.view.support.IPresenter;
 import net.anfet.simple.support.library.recycler.view.support.RecycleViewHolder;
 
@@ -28,8 +26,7 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 	private final IPresenter presenter;
 	private final Queue<RecycleViewHolder<T>> pool;
 
-	public RecyclerViewAdapter(@NonNull Context context, @Nullable Collection<T> items, @NonNull IPresenter presenter) {
-		Assert.assertNotNull(context);
+	public RecyclerViewAdapter(@NonNull Context context, @NonNull IPresenter presenter, @Nullable Collection<T> items) {
 		this.context = context;
 
 		this.items = new LinkedList<>();
@@ -37,9 +34,7 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 			this.items.addAll(items);
 		}
 
-		Assert.assertNotNull(presenter);
 		this.presenter = presenter;
-
 		this.pool = new SynchronousQueue<>();
 	}
 
@@ -100,7 +95,7 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 		notifyDataSetChanged();
 	}
 
-	public void releaseViewHolder(RecycleViewHolder<T> holder) {
+	void releaseViewHolder(RecycleViewHolder<T> holder) {
 		if (!pool.contains(holder)) pool.offer(holder);
 	}
 

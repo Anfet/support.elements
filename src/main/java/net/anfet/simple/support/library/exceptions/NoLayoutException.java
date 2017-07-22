@@ -5,4 +5,7 @@ package net.anfet.simple.support.library.exceptions;
  */
 
 public class NoLayoutException extends RuntimeException {
+	public NoLayoutException(String s) {
+		super(s);
+	}
 }

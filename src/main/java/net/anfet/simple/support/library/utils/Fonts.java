@@ -15,7 +15,7 @@ import java.util.Hashtable;
 
 public class Fonts {
 
-	public static final String ROBOTO_LIGHT = "roboto-light";
+	public static final String ROBOTO_LIGHT = "Roboto-Light";
 	public static final String ROBOTO_BOLD = "Roboto-Bold";
 	public static final String ROBOTO_ITALIC = "Roboto-Italic";
 	public static final String ROBOTO_MEDIUM = "Roboto-Medium";

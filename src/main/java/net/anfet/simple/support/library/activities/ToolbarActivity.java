@@ -8,13 +8,14 @@ import android.support.v7.widget.Toolbar;
 
 import net.anfet.simple.support.library.anotations.layout.ToolbarId;
 import net.anfet.simple.support.library.exceptions.NoIdException;
+import net.anfet.simple.support.library.presenters.Presenter;
 
 /**
  * Активити с {@link Toolbar}
  * для работы либо оверрайднуть {@link #getToolbarId()} либо проставить {@link ToolbarId} нотацию
  */
 
-public class ToolbarActivity<T extends ViewDataBinding> extends SupportActivity<T> {
+public class ToolbarActivity<T extends ViewDataBinding, Z extends Presenter> extends SupportActivity<T, Z> {
 
 	protected Toolbar mToolbar;
 

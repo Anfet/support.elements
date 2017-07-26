@@ -35,7 +35,7 @@ public final class InflateHelper {
 	 * @param root              - корневой view
 	 * @param lowestSuperclass  - самый верхний парент, ниже которого нет смысла лезть
 	 */
-	public static final void injectViewsAndFragments(final Object target, IRootWrapper root, Class lowestSuperclass) {
+	public static void injectViewsAndFragments(final Object target, IRootWrapper root, Class lowestSuperclass) {
 		List<Field> fields = ReflectionSupport.getFields(target.getClass(), lowestSuperclass);
 		for (Field field : fields) {
 			field.setAccessible(true);

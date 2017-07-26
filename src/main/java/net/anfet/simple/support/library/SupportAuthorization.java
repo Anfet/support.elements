@@ -2,7 +2,10 @@ package net.anfet.simple.support.library;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.util.Log;
+
+import net.anfet.support.Nullsafe;
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -41,7 +44,7 @@ public final class SupportAuthorization {
 
 	public void save() {
 		String value = SupportGson.get().toJson(map);
-		preferences.edit().putString(SupportAuthorization.class.getSimpleName(), value).commit();
+		preferences.edit().putString(SupportAuthorization.class.getSimpleName(), value).apply();
 	}
 
 	public LoginMap getMap() {
@@ -67,8 +70,9 @@ public final class SupportAuthorization {
 		return null;
 	}
 
+	@NonNull
 	public String getLastLogin() {
-		return map.lastLogin;
+		return Nullsafe.get(map.lastLogin, "");
 	}
 
 	public void setLastLogin(String lastLogin) {

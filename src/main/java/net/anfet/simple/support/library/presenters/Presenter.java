@@ -1,4 +1,4 @@
-package net.anfet.simple.support.library.controllers;
+package net.anfet.simple.support.library.presenters;
 
 import java.lang.ref.SoftReference;
 
@@ -7,23 +7,25 @@ import io.reactivex.disposables.Disposable;
 
 /**
  * Created by Oleg on 21.07.2017.
+ *
+ * базовый презентер
  */
 
-public abstract class Controller<T> implements Disposable {
+public abstract class Presenter<T extends IPresentable> implements Disposable {
 
 	protected SoftReference<T> controlReference;
 	protected CompositeDisposable disposable;
 
-	public Controller() {
+	public Presenter() {
 
 	}
 
-	public Controller<T> setControl(T control) {
+	public Presenter<T> setControl(T control) {
 		this.controlReference = new SoftReference<T>(control);
 		return this;
 	}
 
-	public void create() {
+	public void created() {
 
 	}
 
@@ -49,7 +51,7 @@ public abstract class Controller<T> implements Disposable {
 		return disposable != null && disposable.isDisposed();
 	}
 
-	protected void registerDisposable(Disposable disposable) {
+	public void registerDisposable(Disposable disposable) {
 		if (this.disposable == null || this.disposable.isDisposed()) this.disposable = new CompositeDisposable();
 		this.disposable.add(disposable);
 	}

@@ -13,13 +13,14 @@ import net.anfet.simple.support.library.anotations.layout.DrawerId;
 import net.anfet.simple.support.library.exceptions.NoIdException;
 import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.inflation.ViewRootWrapper;
+import net.anfet.simple.support.library.presenters.Presenter;
 import net.anfet.simple.support.library.utils.Fonts;
 
 
 /**
  * Класс поддержки для {@link SupportActivity} у которых присуствует {@link DrawerLayout} навигационный дравер
  */
-public abstract class DrawerSupportActivity<T extends ViewDataBinding> extends ToolbarActivity<T> {
+public abstract class DrawerSupportActivity<T extends ViewDataBinding, Z extends Presenter> extends ToolbarActivity<T, Z> {
 
 	/**
 	 * переключатель дравера

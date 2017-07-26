@@ -1,6 +1,8 @@
 package net.anfet.simple.support.library.activities;
 
 import android.app.Dialog;
+import android.databinding.DataBindingUtil;
+import android.databinding.ViewDataBinding;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -13,8 +15,6 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import junit.framework.Assert;
-
 import net.anfet.simple.support.library.anotations.Alert;
 import net.anfet.simple.support.library.anotations.fonts.UseFont;
 import net.anfet.simple.support.library.anotations.layout.LayoutId;
@@ -23,19 +23,24 @@ import net.anfet.simple.support.library.anotations.layout.NoLayout;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
 import net.anfet.simple.support.library.inflation.DetachableBroadcastReceiver;
 import net.anfet.simple.support.library.inflation.InflateHelper;
+import net.anfet.simple.support.library.presenters.IPresentable;
+import net.anfet.simple.support.library.presenters.Presenter;
+import net.anfet.simple.support.library.presenters.PresenterSupport;
 import net.anfet.simple.support.library.rxtasks.RxTasks;
 import net.anfet.simple.support.library.utils.Fonts;
 import net.anfet.simple.support.library.utils.IFonted;
 
 import java.util.Collection;
 
-import butterknife.ButterKnife;
-
 
 /**
  * Фрагмент поддежки
  */
-public abstract class SupportFragment extends DialogFragment implements IFonted {
+public abstract class SupportFragment<B extends ViewDataBinding, Z extends Presenter> extends DialogFragment implements IFonted, IPresentable<Z> {
+
+	protected B mDataBinding;
+
+	protected Z mPresenter;
 
 	/**
 	 * рут
@@ -50,16 +55,26 @@ public abstract class SupportFragment extends DialogFragment implements IFonted 
 
 	}
 
+	public B getDataBinding() {
+		return mDataBinding;
+	}
+
+	public Z getPresenter() {
+		return mPresenter;
+	}
+
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(getClass().isAnnotationPresent(MenuId.class));
+		mPresenter = PresenterSupport.create(this);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		broadcastReceivers = InflateHelper.registerLocalReceivers(this, getActivity(), getClass());
+		if (mPresenter != null) getPresenter().resumed();
 	}
 
 	/**
@@ -84,7 +99,6 @@ public abstract class SupportFragment extends DialogFragment implements IFonted 
 	}
 
 	public SupportActivity getSupportActivity() {
-		Assert.assertTrue(getActivity() instanceof SupportActivity);
 		return (SupportActivity) getActivity();
 	}
 
@@ -119,8 +133,14 @@ public abstract class SupportFragment extends DialogFragment implements IFonted 
 			return super.onCreateView(inflater, container, savedInstanceState);
 		}
 
-		mRoot = inflater.inflate(getLayoutId(), container, false);
-		ButterKnife.bind(this, mRoot);
+		mDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), container, false);
+		if (mDataBinding == null) {
+			mRoot = inflater.inflate(getLayoutId(), container, false);
+		} else {
+			mRoot = mDataBinding.getRoot();
+		}
+
+//		ButterKnife.bind(this, mRoot);
 		onAfterInflate(savedInstanceState);
 		return mRoot;
 	}
@@ -156,6 +176,8 @@ public abstract class SupportFragment extends DialogFragment implements IFonted 
 		InflateHelper.detachReceivers(getActivity(), broadcastReceivers);
 		broadcastReceivers = null;
 
+		if (mPresenter != null) getPresenter().stopped();
+
 		super.onPause();
 	}
 
@@ -175,5 +197,10 @@ public abstract class SupportFragment extends DialogFragment implements IFonted 
 	 */
 	protected Dialog onSetupDialog(AlertDialog.Builder builder, Bundle savedInstanceState) {
 		return builder.create();
+	}
+
+	@Override
+	public void configurePresenter(Z presenter) {
+
 	}
 }

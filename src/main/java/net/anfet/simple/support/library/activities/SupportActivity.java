@@ -10,19 +10,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.google.firebase.crash.FirebaseCrash;
-
 import net.anfet.simple.support.library.anotations.ActivityTransitition;
+import net.anfet.simple.support.library.anotations.Title;
 import net.anfet.simple.support.library.anotations.fonts.UseFont;
 import net.anfet.simple.support.library.anotations.layout.LayoutId;
 import net.anfet.simple.support.library.anotations.layout.MenuId;
 import net.anfet.simple.support.library.anotations.layout.RootId;
-import net.anfet.simple.support.library.controllers.Controllable;
-import net.anfet.simple.support.library.controllers.Controller;
 import net.anfet.simple.support.library.exceptions.NoIdException;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
 import net.anfet.simple.support.library.inflation.DetachableBroadcastReceiver;
 import net.anfet.simple.support.library.inflation.InflateHelper;
+import net.anfet.simple.support.library.presenters.IPresentable;
+import net.anfet.simple.support.library.presenters.Presenter;
+import net.anfet.simple.support.library.presenters.PresenterSupport;
 import net.anfet.simple.support.library.rxtasks.RxTasks;
 import net.anfet.simple.support.library.utils.Fonts;
 import net.anfet.simple.support.library.utils.IBackpressPropagator;
@@ -32,21 +32,17 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import butterknife.ButterKnife;
-
 
 /**
  * Поддерживающая форма, с рут элементом и уже проинжектенными вьюшками
  */
-public abstract class SupportActivity<T extends ViewDataBinding> extends AppCompatActivity implements IFonted {
+public abstract  class SupportActivity<T extends ViewDataBinding, Z extends Presenter> extends AppCompatActivity implements IFonted, IPresentable<Z> {
 
 	protected View mRoot = null;
 	protected Collection<DetachableBroadcastReceiver> mRegisteredReceivers;
 	protected final List<IBackpressPropagator> mBackPressPropagators = new LinkedList<>();
 	protected T mDataBinding;
-	protected Controller mController;
-
-
+	protected Z mPresenter;
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -58,8 +54,8 @@ public abstract class SupportActivity<T extends ViewDataBinding> extends AppComp
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	public Controller getController() {
-		return mController;
+	public Z getPresenter() {
+		return (Z) mPresenter;
 	}
 
 	@Override
@@ -98,32 +94,18 @@ public abstract class SupportActivity<T extends ViewDataBinding> extends AppComp
 
 		Fonts.setFont(getRoot(), getFont());
 
-		ButterKnife.bind(this);
+//		ButterKnife.bind(this);
 
 		InflateHelper.injectViewsAndFragments(this, getRoot(), SupportActivity.class);
 
-		Controllable controllableNotation = getClass().getAnnotation(Controllable.class);
-		if (controllableNotation != null) {
-			try {
-				mController = (Controller) controllableNotation.value().newInstance();
-			} catch (InstantiationException e) {
-				FirebaseCrash.report(e);
-			} catch (IllegalAccessException e) {
-				FirebaseCrash.report(e);
-			}
-
-			mController.setControl(this);
-			onPrepareController();
-			mController.create();
-		}
-
+		mPresenter = PresenterSupport.create(this);
 	}
 
-	/**
-	 * функция вызывается для кастомной настройки контроллера
-	 */
-	protected void onPrepareController() {
-
+	@Override
+	protected void onStart() {
+		super.onStart();
+		Title titleNotation = getClass().getAnnotation(Title.class);
+		if (titleNotation != null) setTitle(titleNotation.value());
 	}
 
 	public T getDataBinding() {
@@ -189,12 +171,12 @@ public abstract class SupportActivity<T extends ViewDataBinding> extends AppComp
 	protected void onResume() {
 		super.onResume();
 		mRegisteredReceivers = InflateHelper.registerLocalReceivers(this, this, getClass());
-		mController.resumed();
+		mPresenter.resumed();
 	}
 
 	@Override
 	protected void onPause() {
-		mController.stopped();
+		mPresenter.stopped();
 		InflateHelper.detachReceivers(this, mRegisteredReceivers);
 		RxTasks.abandonAllFor(this);
 		mRegisteredReceivers = null;
@@ -243,4 +225,8 @@ public abstract class SupportActivity<T extends ViewDataBinding> extends AppComp
 		}
 	}
 
+	@Override
+	public void configurePresenter(Z presenter) {
+
+	}
 }

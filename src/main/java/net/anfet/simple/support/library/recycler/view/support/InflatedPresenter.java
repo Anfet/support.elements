@@ -16,7 +16,7 @@ import net.anfet.simple.support.library.utils.Fonts;
  * Презентер заполняющий своих наследников по рефлексии
  */
 
-public abstract class InflatedPresenter<T> implements IFontedPresenter<T, RecycleViewHolder<T>>, IClickListener<T> {
+public abstract class InflatedPresenter<T> implements IFontedPresenter<T, RecycleViewHolder<T>> {
 
 	@Nullable
 	private IClickListener<T> clickListener = null;

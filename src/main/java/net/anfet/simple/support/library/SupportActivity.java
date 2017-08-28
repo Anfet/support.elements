@@ -1,16 +1,12 @@
 package net.anfet.simple.support.library;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import junit.framework.Assert;
 
 import net.anfet.simple.support.library.anotations.ActivityTransitition;
 import net.anfet.simple.support.library.anotations.Font;
@@ -28,6 +24,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+
 
 /**
  * Поддерживающая форма, с рут элементом и уже проинжектенными вьюшками
@@ -36,17 +35,8 @@ public abstract class SupportActivity extends AppCompatActivity {
 
 	private View mRoot = null;
 	private Collection<DetachableBroadcastReceiver> registeredReceivers;
-
+	protected CompositeDisposable mLifecycleDisposable;
 	private final List<IBackpressPropagator> mBackPressPropagators = new LinkedList<>();
-
-	public void initToolbar(@NonNull Toolbar toolbar) {
-		Assert.assertNotNull(toolbar);
-
-		setSupportActionBar(toolbar);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setTitle("");
-	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -56,6 +46,10 @@ public abstract class SupportActivity extends AppCompatActivity {
 		}
 
 		return super.onCreateOptionsMenu(menu);
+	}
+
+	public void syncToLifecycle(Disposable disposable) {
+		mLifecycleDisposable.add(disposable);
 	}
 
 	@Override
@@ -95,6 +89,8 @@ public abstract class SupportActivity extends AppCompatActivity {
 		Fonts.setFont(getRoot(), getFont());
 		InflateHelper.injectViewsAndFragments(this, getRoot(), getSupportFragmentManager(), SupportActivity.class);
 		InflateHelper.registerSimpleHandlers(this, getRoot(), SupportActivity.class);
+
+		mLifecycleDisposable = new CompositeDisposable();
 	}
 
 	protected String getFont() {
@@ -162,6 +158,8 @@ public abstract class SupportActivity extends AppCompatActivity {
 		Tasks.forfeitAllFor(this);
 		InflateHelper.detachReceivers(this, registeredReceivers);
 		registeredReceivers = null;
+		mLifecycleDisposable.clear();
+		mLifecycleDisposable = new CompositeDisposable();
 		super.onPause();
 	}
 

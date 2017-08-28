@@ -30,6 +30,8 @@ import net.anfet.tasks.Tasks;
 
 import java.util.Collection;
 
+import io.reactivex.disposables.CompositeDisposable;
+
 
 /**
  * Фрагмент поддежки
@@ -40,6 +42,8 @@ public abstract class SupportFragment extends DialogFragment {
 	 * рут
 	 */
 	protected View mRoot;
+	protected CompositeDisposable mLifecycleDisposable;
+
 	/**
 	 * Список бродкастов для дерегистрации
 	 */
@@ -53,6 +57,7 @@ public abstract class SupportFragment extends DialogFragment {
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(getClass().isAnnotationPresent(Menu.class));
+		mLifecycleDisposable = new CompositeDisposable();
 	}
 
 	@Override
@@ -171,6 +176,9 @@ public abstract class SupportFragment extends DialogFragment {
 		Tasks.forfeitAllFor(this);
 		InflateHelper.detachReceivers(getActivity(), broadcastReceivers);
 		broadcastReceivers = null;
+
+		mLifecycleDisposable.clear();
+		mLifecycleDisposable = new CompositeDisposable();
 
 		super.onPause();
 	}

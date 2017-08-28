@@ -3,8 +3,8 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.0'
-        classpath 'com.google.gms:google-services:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.0-beta3'
+        classpath 'com.google.gms:google-services:3.1.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -15,20 +15,21 @@ allprojects {
     repositories {
         jcenter()
         maven { url "https://jitpack.io" }
+        google()
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
-        versionCode 5
-        versionName "1.0.0.7"
+        targetSdkVersion 26
+        versionCode 8
+        versionName "1.0.0.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -40,19 +41,33 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dataBinding {
+        enabled true
     }
 }
+
+ext.rx_version = '2+'
+ext.app_compat_version = '26.0.1'
+ext.gson_version = '2+'
+ext.google_play_version = '11+'
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
 
-    compile 'com.google.code.gson:gson:2.7'
-    compile 'com.google.firebase:firebase-crash:11.0.2'
+    compile "com.google.code.gson:gson:$gson_version"
+    compile "com.google.firebase:firebase-crash:$google_play_version"
+
     compile 'com.github.Anfet:tasks:1.0.15'
-    compile "com.android.support:support-core-utils:25.3.1"
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
-    compile 'com.android.support:appcompat-v7:25.3.1'
+
+    compile "com.android.support:appcompat-v7:$app_compat_version"
+    compile "com.android.support:support-core-utils:$app_compat_version"
+    compile "com.android.support:recyclerview-v7:$app_compat_version"
+    compile "com.android.support:design:$app_compat_version"
+
+    compile "io.reactivex.rxjava2:rxandroid:$rx_version"
+    compile "io.reactivex.rxjava2:rxjava:$rx_version"
 }

@@ -5,6 +5,8 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.Toolbar;
 
+import junit.framework.Assert;
+
 import net.anfet.simple.support.library.anotations.WithToolbar;
 import net.anfet.simple.support.library.exceptions.NoIdException;
 
@@ -19,6 +21,15 @@ public class ToolbarActivity extends SupportActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		initToolbar(getToolbar());
+	}
+
+	public void initToolbar(@NonNull Toolbar toolbar) {
+		Assert.assertNotNull(toolbar);
+
+		setSupportActionBar(toolbar);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setHomeButtonEnabled(true);
+		getSupportActionBar().setTitle("");
 	}
 
 	private

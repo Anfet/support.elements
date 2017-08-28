@@ -2,7 +2,7 @@ package net.anfet.simple.support.library.adapters;
 
 import android.content.Context;
 
-import net.anfet.simple.support.library.lists.IFilter;
+import net.anfet.abstraction.IFilter;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -41,7 +41,7 @@ public class FilteredListAdapter<T> extends ListHolderAdapter<T> {
 					T item = iterator.next();
 					boolean remove = false;
 					for (IFilter<T> filter : filters) {
-						if (!filter.onFilter(item)) {
+						if (!filter.filter(item)) {
 							remove = true;
 							break;
 						}

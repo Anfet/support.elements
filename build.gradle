@@ -1,7 +1,19 @@
+allprojects {
+    repositories {
+        jcenter()
+        maven { url "https://jitpack.io" }
+        google()
+    }
+}
+
+
 buildscript {
     repositories {
         jcenter()
+        maven { url "https://jitpack.io" }
+        google()
     }
+
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.0-beta3'
         classpath 'com.google.gms:google-services:3.1.0'
@@ -11,13 +23,6 @@ buildscript {
     }
 }
 
-allprojects {
-    repositories {
-        jcenter()
-        maven { url "https://jitpack.io" }
-        google()
-    }
-}
 
 apply plugin: 'com.android.library'
 

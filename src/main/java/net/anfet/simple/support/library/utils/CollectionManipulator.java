@@ -17,14 +17,14 @@ import java.util.List;
 
 public class CollectionManipulator<T> {
 
-	private final List<IFilter<T>> filters;
+	private final List<IManipulatorFilter<T>> filters;
 	private Comparator<T> comparator;
 
 	public CollectionManipulator() {
 		filters = new LinkedList<>();
 	}
 
-	public static <X> Collection<X> getItems(Collection<X> items, IFilter<X> filter) {
+	public static <X> Collection<X> getItems(Collection<X> items, IManipulatorFilter<X> filter) {
 		return new CollectionManipulator<X>().addFilter(filter).getItems(items);
 	}
 
@@ -33,7 +33,7 @@ public class CollectionManipulator<T> {
 		return this;
 	}
 
-	public CollectionManipulator<T> addFilter(@NonNull IFilter<T> filter) {
+	public CollectionManipulator<T> addFilter(@NonNull IManipulatorFilter<T> filter) {
 		synchronized (filters) {
 			filters.add(filter);
 		}
@@ -49,7 +49,7 @@ public class CollectionManipulator<T> {
 	}
 
 	@NonNull
-	public Collection<T> getItems(@Nullable Collection<T> items) {
+	public synchronized Collection<T> getItems(@Nullable Collection<T> items) {
 		List<T> list = new LinkedList<>();
 
 		if (items == null || items.isEmpty()) {
@@ -62,8 +62,8 @@ public class CollectionManipulator<T> {
 			for (T item : items) {
 				boolean allow = true;
 				synchronized (filters) {
-					for (IFilter<T> filter : filters) {
-						if (!filter.filter(item)) {
+					for (IManipulatorFilter<T> filter : filters) {
+						if (!filter.filter(items, item)) {
 							allow = false;
 							break;
 						}
@@ -80,5 +80,9 @@ public class CollectionManipulator<T> {
 			Collections.sort(list, comparator);
 
 		return list;
+	}
+
+	public interface IManipulatorFilter<T> {
+		boolean filter(Collection<T> items, T item);
 	}
 }

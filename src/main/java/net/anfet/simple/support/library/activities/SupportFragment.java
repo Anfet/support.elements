@@ -22,11 +22,9 @@ import net.anfet.simple.support.library.anotations.layout.MenuId;
 import net.anfet.simple.support.library.anotations.layout.NoLayout;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
 import net.anfet.simple.support.library.inflation.DetachableBroadcastReceiver;
-import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.presenters.IPresentable;
 import net.anfet.simple.support.library.presenters.Presenter;
 import net.anfet.simple.support.library.presenters.PresenterSupport;
-import net.anfet.simple.support.library.rxtasks.RxTasks;
 import net.anfet.simple.support.library.utils.Fonts;
 import net.anfet.simple.support.library.utils.IFonted;
 
@@ -68,13 +66,20 @@ public abstract class SupportFragment<B extends ViewDataBinding, Z extends Prese
 		super.onCreate(savedInstanceState);
 		setHasOptionsMenu(getClass().isAnnotationPresent(MenuId.class));
 		mPresenter = PresenterSupport.create(this);
+		configurePresenter(mPresenter);
+	}
+
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		if (mPresenter != null) getPresenter().resumed();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		broadcastReceivers = InflateHelper.registerLocalReceivers(this, getActivity(), getClass());
-		if (mPresenter != null) getPresenter().resumed();
+//		broadcastReceivers = InflateHelper.registerLocalReceivers(this, getActivity(), getClass());
 	}
 
 	/**
@@ -88,14 +93,14 @@ public abstract class SupportFragment<B extends ViewDataBinding, Z extends Prese
 			return layoutAnnotation.value();
 
 		if (getClass().isAnnotationPresent(Alert.class)) {
-			return getClass().getAnnotation(Alert.class).layoutId();
+			return getClass().getAnnotation(Alert.class).value();
 		}
 
 		if (getClass().isAnnotationPresent(NoLayout.class)) {
 			return 0;
 		}
 
-		throw new NoLayoutException("No layoutId for " + getClass().getSimpleName());
+		throw new NoLayoutException("No value for " + getClass().getSimpleName());
 	}
 
 	public SupportActivity getSupportActivity() {
@@ -103,7 +108,15 @@ public abstract class SupportFragment<B extends ViewDataBinding, Z extends Prese
 	}
 
 	protected void inflateLayoutIntoBuilder(AlertDialog.Builder builder) {
-		mRoot = LayoutInflater.from(builder.getContext()).inflate(getLayoutId(), null, false);
+
+		LayoutInflater inflater = LayoutInflater.from(builder.getContext());
+		mDataBinding = DataBindingUtil.inflate(inflater, getLayoutId(), null, false);
+		if (mDataBinding == null) {
+			mRoot = inflater.inflate(getLayoutId(), null, false);
+		} else {
+			mRoot = mDataBinding.getRoot();
+		}
+
 		builder.setView(mRoot);
 	}
 
@@ -124,7 +137,7 @@ public abstract class SupportFragment<B extends ViewDataBinding, Z extends Prese
 			Fonts.setFont(mRoot, getFont());
 		}
 
-		InflateHelper.injectViewsAndFragments(this, mRoot, getClass());
+//		InflateHelper.injectViewsAndFragments(this, mRoot, getClass());
 	}
 
 	@Override
@@ -172,11 +185,11 @@ public abstract class SupportFragment<B extends ViewDataBinding, Z extends Prese
 	@Override
 	public void onPause() {
 
-		RxTasks.abandonAllFor(this);
-		InflateHelper.detachReceivers(getActivity(), broadcastReceivers);
+//		RxTasks.abandonAllFor(this);
+//		InflateHelper.detachReceivers(getActivity(), broadcastReceivers);
 		broadcastReceivers = null;
 
-		if (mPresenter != null) getPresenter().stopped();
+		if (mPresenter != null) getPresenter().paused();
 
 		super.onPause();
 	}

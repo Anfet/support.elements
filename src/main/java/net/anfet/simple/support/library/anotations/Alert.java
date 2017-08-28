@@ -16,5 +16,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Alert {
-	@LayoutRes int layoutId();
+	@LayoutRes int value();
 }

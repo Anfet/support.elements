@@ -19,11 +19,9 @@ import net.anfet.simple.support.library.anotations.layout.RootId;
 import net.anfet.simple.support.library.exceptions.NoIdException;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
 import net.anfet.simple.support.library.inflation.DetachableBroadcastReceiver;
-import net.anfet.simple.support.library.inflation.InflateHelper;
 import net.anfet.simple.support.library.presenters.IPresentable;
 import net.anfet.simple.support.library.presenters.Presenter;
 import net.anfet.simple.support.library.presenters.PresenterSupport;
-import net.anfet.simple.support.library.rxtasks.RxTasks;
 import net.anfet.simple.support.library.utils.Fonts;
 import net.anfet.simple.support.library.utils.IBackpressPropagator;
 import net.anfet.simple.support.library.utils.IFonted;
@@ -93,11 +91,7 @@ public abstract  class SupportActivity<T extends ViewDataBinding, Z extends Pres
 		}
 
 		Fonts.setFont(getRoot(), getFont());
-
-//		ButterKnife.bind(this);
-
-		InflateHelper.injectViewsAndFragments(this, getRoot(), SupportActivity.class);
-
+//		InflateHelper.injectViewsAndFragments(this, getRoot(), SupportActivity.class);
 		mPresenter = PresenterSupport.create(this);
 	}
 
@@ -106,6 +100,8 @@ public abstract  class SupportActivity<T extends ViewDataBinding, Z extends Pres
 		super.onStart();
 		Title titleNotation = getClass().getAnnotation(Title.class);
 		if (titleNotation != null) setTitle(titleNotation.value());
+
+		if (mPresenter != null) mPresenter.created();
 	}
 
 	public T getDataBinding() {
@@ -170,17 +166,23 @@ public abstract  class SupportActivity<T extends ViewDataBinding, Z extends Pres
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mRegisteredReceivers = InflateHelper.registerLocalReceivers(this, this, getClass());
-		mPresenter.resumed();
+//		mRegisteredReceivers = InflateHelper.registerLocalReceivers(this, this, getClass());
+		if (mPresenter != null) mPresenter.resumed();
 	}
 
 	@Override
 	protected void onPause() {
-		mPresenter.stopped();
-		InflateHelper.detachReceivers(this, mRegisteredReceivers);
-		RxTasks.abandonAllFor(this);
-		mRegisteredReceivers = null;
+		if (mPresenter != null) mPresenter.paused();
+//		InflateHelper.detachReceivers(this, mRegisteredReceivers);
+//		RxTasks.abandonAllFor(this);
+//		mRegisteredReceivers = null;
 		super.onPause();
+	}
+
+	@Override
+	protected void onDestroy() {
+		if (mPresenter != null) mPresenter.destroyed();
+		super.onDestroy();
 	}
 
 	@Override

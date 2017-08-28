@@ -29,15 +29,28 @@ public abstract class Presenter<T extends IPresentable> implements Disposable {
 
 	}
 
+	public CompositeDisposable getDisposable() {
+		if (this.disposable == null || this.disposable.isDisposed()) this.disposable = new CompositeDisposable();
+		return disposable;
+	}
+
 	public void resumed() {
 
 	}
 
-	public void stopped() {
+	public void paused() {
 		dispose();
 	}
 
 	public T getControl() {
+		if (controlReference == null && isDisposed()) {
+			throw new EDisposed("Presenter is already disposed; Did you register disposable?");
+		}
+
+		if (controlReference != null && controlReference.get() == null) {
+			throw new NullPointerException("Control not set for presenter. Weird");
+		}
+
 		return controlReference.get();
 	}
 
@@ -51,9 +64,11 @@ public abstract class Presenter<T extends IPresentable> implements Disposable {
 		return disposable != null && disposable.isDisposed();
 	}
 
-	public void registerDisposable(Disposable disposable) {
-		if (this.disposable == null || this.disposable.isDisposed()) this.disposable = new CompositeDisposable();
-		this.disposable.add(disposable);
+	public void synchToLifecycle(Disposable disposable) {
+		getDisposable().add(disposable);
 	}
 
+	public void destroyed() {
+		controlReference = null;
+	}
 }

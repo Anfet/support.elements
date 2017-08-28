@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import net.anfet.simple.support.library.recycler.view.support.IPresenter;
+import net.anfet.simple.support.library.recycler.view.support.IStableIdSupply;
 import net.anfet.simple.support.library.recycler.view.support.RecycleViewHolder;
 
 import java.util.Collection;
@@ -18,13 +19,14 @@ import java.util.concurrent.SynchronousQueue;
  * Враппер для адаптера
  */
 
-public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHolder<T>> {
+public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
-	private final Context context;
-	private final LinkedList<T> items;
-	private final IPresenter presenter;
-	private final Queue<RecycleViewHolder<T>> pool;
+	protected final Context context;
+	protected final LinkedList<T> items;
+	protected final IPresenter presenter;
+	protected final Queue<RecyclerView.ViewHolder> pool;
+	protected IStableIdSupply<T> mStableIdSupply;
 
 	public RecyclerViewAdapter(@NonNull Context context, @NonNull IPresenter presenter, @Nullable Collection<T> items) {
 		this.context = context;
@@ -36,12 +38,30 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 
 		this.presenter = presenter;
 		this.pool = new SynchronousQueue<>();
+		setHasStableIds(true);
 	}
 
+	public void setStableIdSupply(IStableIdSupply<T> supply) {
+		this.mStableIdSupply = supply;
+	}
 
 	@Override
-	public RecycleViewHolder<T> onCreateViewHolder(ViewGroup parent, int viewType) {
-		RecycleViewHolder<T> holder = pool.poll();
+	public long getItemId(int position) {
+
+		T item = items.get(position);
+		if (item == null)
+			return RecyclerView.NO_ID;
+
+
+		if (mStableIdSupply != null)
+			return mStableIdSupply.getStableId(item);
+
+		return items.get(position).hashCode();
+	}
+
+	@Override
+	public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+		RecyclerView.ViewHolder holder = pool.poll();
 		if (holder == null) {
 			holder = presenter.getNewViewHolder(context, parent);
 			presenter.initHolder(holder);
@@ -50,9 +70,10 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 	}
 
 	@Override
-	public void onBindViewHolder(RecycleViewHolder<T> holder, int position) {
+	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 		presenter.populateView(context, holder, getItem(position), position);
 	}
+
 
 	public T getItem(int position) throws IndexOutOfBoundsException {
 		synchronized (items) {
@@ -105,6 +126,17 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 		}
 	}
 
+	public void addItem(T item, int position) {
+		items.add(position, item);
+		notifyItemInserted(position);
+	}
+
+	public void addItems(Collection<T> objects) {
+		for (T object : objects) {
+			addItem(object);
+		}
+	}
+
 	private void addItem(T object) {
 		synchronized (this.items) {
 			items.add(object);
@@ -117,6 +149,33 @@ public class RecyclerViewAdapter<T> extends RecyclerView.Adapter<RecycleViewHold
 			int idx = items.indexOf(object);
 			if (idx > -1) {
 				notifyItemChanged(idx);
+			}
+		}
+	}
+
+	public void replace(T object) {
+		synchronized (items) {
+			int idx = items.indexOf(object);
+			if (idx > -1) {
+				items.set(idx, object);
+				notifyItemChanged(idx);
+			}
+		}
+	}
+
+
+	public void removeItems(@NonNull Collection<T> items) {
+		for (T item : items) removeItem(item);
+	}
+
+	public void updateAndMove(T object, int idx) {
+		synchronized (items) {
+			int old = items.indexOf(object);
+			items.set(old, object);
+			if (old != idx) {
+				items.remove(old);
+				items.add(idx, object);
+				notifyItemMoved(old, idx);
 			}
 		}
 	}

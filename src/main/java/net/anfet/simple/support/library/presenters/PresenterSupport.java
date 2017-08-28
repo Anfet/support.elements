@@ -1,6 +1,7 @@
 package net.anfet.simple.support.library.presenters;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.firebase.crash.FirebaseCrash;
 
@@ -19,14 +20,14 @@ public final class PresenterSupport {
 				Z mPresenter = (Z) presentableNotation.value().newInstance();
 				mPresenter.setControl(target);
 				target.configurePresenter(mPresenter);
-				mPresenter.created();
-
 				return mPresenter;
 			} catch (java.lang.InstantiationException e) {
 				FirebaseCrash.report(e);
 			} catch (IllegalAccessException e) {
 				FirebaseCrash.report(e);
 			}
+		} else {
+			Log.w(PresenterSupport.class.getSimpleName(), "No Presentable notation is specified");
 		}
 
 		return null;

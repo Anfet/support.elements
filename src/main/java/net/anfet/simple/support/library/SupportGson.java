@@ -17,6 +17,7 @@ import java.lang.reflect.Type;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.Calendar;
 
 /**
  * Gson поддержки для встраивания нужных классов
@@ -31,6 +32,7 @@ public class SupportGson {
 
 		builder.registerTypeAdapter(Time.class, new TimeSerializer());
 		builder.registerTypeAdapter(Timestamp.class, new TimestampSerializer());
+		builder.registerTypeAdapter(Calendar.class, new CalendarSerializer());
 		return builder;
 	}
 
@@ -66,6 +68,25 @@ public class SupportGson {
 		@Override
 		public JsonElement serialize(Timestamp src, Type typeOfSrc, JsonSerializationContext context) {
 			return new JsonPrimitive(Dates.yyyyMMddHHmmss.format(src));
+		}
+	}
+
+	private static class CalendarSerializer implements JsonSerializer<Calendar>, JsonDeserializer<Calendar> {
+
+		@Override
+		public Calendar deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+			try {
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTimeInMillis(json.getAsLong() * 1000);
+				return calendar;
+			} catch (ClassCastException e) {
+				return null;
+			}
+		}
+
+		@Override
+		public JsonElement serialize(Calendar src, Type typeOfSrc, JsonSerializationContext context) {
+			return new JsonPrimitive(src.getTimeInMillis());
 		}
 	}
 }

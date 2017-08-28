@@ -126,4 +126,10 @@ public final class Dates {
 		a.add(Calendar.DAY_OF_MONTH, -1);
 		return a.getTime().equals(b.getTime());
 	}
+
+	public static Calendar utc2calendar(long utc) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeInMillis(utc);
+		return calendar;
+	}
 }

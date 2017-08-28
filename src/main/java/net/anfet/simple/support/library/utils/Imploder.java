@@ -18,7 +18,7 @@ public final class Imploder {
 	}
 
 	public static String[] makeListOfValues(Collection<?> collection) {
-		ArrayList list = new ArrayList(collection);
+		ArrayList<?> list = new ArrayList(collection);
 		String[] array = new String[list.size()];
 		for (int i = 0; i < list.size(); i++) {
 			array[i] = list.get(i).toString();

@@ -1,4 +1,4 @@
-package net.anfet.simple.support.library.recycler.view.support;
+package net.anfet.simple.support.library.recycler.view.events;
 
 import android.support.annotation.NonNull;
 import android.view.View;

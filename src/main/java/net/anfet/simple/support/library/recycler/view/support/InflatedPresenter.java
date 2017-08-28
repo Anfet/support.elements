@@ -10,6 +10,7 @@ import net.anfet.simple.support.library.anotations.fonts.UseFont;
 import net.anfet.simple.support.library.anotations.layout.LayoutId;
 import net.anfet.simple.support.library.exceptions.NoLayoutException;
 import net.anfet.simple.support.library.inflation.InflateHelper;
+import net.anfet.simple.support.library.recycler.view.events.IClickListener;
 import net.anfet.simple.support.library.utils.Fonts;
 
 /**

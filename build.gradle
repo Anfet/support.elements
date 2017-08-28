@@ -1,30 +1,8 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
-        classpath 'com.google.gms:google-services:3.0.0'
-        classpath 'me.tatarka:gradle-retrolambda:3.6.1'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
-}
-
-allprojects {
-    repositories {
-        jcenter()
-        maven { url "https://jitpack.io" }
-    }
-}
-
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.0"
+    buildToolsVersion "26.0.1"
 
     defaultConfig {
         minSdkVersion 14
@@ -54,18 +32,17 @@ android {
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile "com.google.code.gson:gson:$gson_version"
 
-    compile 'com.google.code.gson:gson:+'
-    compile 'com.google.firebase:firebase-crash:11.+'
-    compile "com.android.support:support-core-utils:26.+"
-    compile 'com.android.support:recyclerview-v7:26.+'
-    compile 'com.android.support:design:26.+'
-    compile 'com.android.support:appcompat-v7:26.+'
-    compile 'com.github.Anfet:lists:1.0.0.3'
+    compile "com.google.firebase:firebase-crash:$google_play_version"
 
-//    compile 'com.jakewharton:butterknife:8.+'
-//    annotationProcessor 'com.jakewharton:butterknife-compiler:8.+'
+    compile "com.android.support:support-core-utils:$app_compat_version"
+    compile "com.android.support:recyclerview-v7:$app_compat_version"
+    compile "com.android.support:design:$app_compat_version"
+    compile "com.android.support:appcompat-v7:$app_compat_version"
 
-    compile 'io.reactivex.rxjava2:rxandroid:2.+'
-    compile 'io.reactivex.rxjava2:rxjava:2.+'
+    compile "com.github.Anfet:lists:$lists_version"
+
+    compile "io.reactivex.rxjava2:rxandroid:$rx_version"
+    compile "io.reactivex.rxjava2:rxjava:$rx_version"
 }

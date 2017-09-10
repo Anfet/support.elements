@@ -36,7 +36,7 @@ public final class RxTasks {
 
 	static <In, Out, Progress> void enqueue(final RxRunner<In, Out, Progress> runner, Object owner) {
 		WeakReference<Object> ref = Nullsafe.get(findRef(owner), new WeakReference<>(owner));
-		tasks.add(ref, (RxRunner) runner);
+		tasks.add(ref, runner);
 
 		Observable.fromCallable(runner)
 				.subscribeOn(Schedulers.io())

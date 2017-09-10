@@ -42,7 +42,7 @@ public abstract class Presenter<T extends IPresentable> implements Disposable {
 		dispose();
 	}
 
-	public T getControl() {
+	public T getView() {
 		if (controlReference == null && isDisposed()) {
 			throw new EDisposed("Presenter is already disposed; Did you register disposable?");
 		}

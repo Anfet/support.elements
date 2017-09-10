@@ -22,7 +22,7 @@ public class ToolbarActivity<T extends ViewDataBinding, Z extends Presenter> ext
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mToolbar = (Toolbar) findViewById(getToolbarId());
+		mToolbar = findViewById(getToolbarId());
 		initToolbar(mToolbar);
 	}
 

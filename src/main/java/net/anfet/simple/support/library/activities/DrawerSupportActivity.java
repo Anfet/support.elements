@@ -92,7 +92,7 @@ public abstract class DrawerSupportActivity<T extends ViewDataBinding, Z extends
 		if (getRoot() instanceof DrawerLayout) {
 			mDrawerLayout = (DrawerLayout) getRoot();
 		} else {
-			mDrawerLayout = (DrawerLayout) getRoot().findViewById(getDrawerLayoutId());
+			mDrawerLayout = getRoot().findViewById(getDrawerLayoutId());
 		}
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);

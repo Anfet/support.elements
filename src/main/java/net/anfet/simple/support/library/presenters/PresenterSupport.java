@@ -14,7 +14,7 @@ public final class PresenterSupport {
 	@Nullable
 	public static <Z extends Presenter> Z create(IPresentable target) {
 
-		Presentable presentableNotation = (Presentable) target.getClass().getAnnotation(Presentable.class);
+		Presentable presentableNotation = target.getClass().getAnnotation(Presentable.class);
 		if (presentableNotation != null) {
 			try {
 				Z mPresenter = (Z) presentableNotation.value().newInstance();

@@ -52,6 +52,6 @@ public class DetachableBroadcastReceiver extends BroadcastReceiver {
 
 
 	private enum ReceiverState {
-		ATTACHED, DETACHED;
+		ATTACHED, DETACHED
 	}
 }

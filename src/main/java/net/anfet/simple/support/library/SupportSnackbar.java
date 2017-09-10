@@ -44,7 +44,7 @@ public final class SupportSnackbar {
 
 	private SupportSnackbar setActionColor(int actionColor) {
 		View view = snackbar.getView();
-		TextView tv = (TextView) view.findViewById(R.id.snackbar_action);
+		TextView tv = view.findViewById(R.id.snackbar_action);
 		tv.setTextColor(actionColor);
 		return this;
 	}
@@ -55,7 +55,7 @@ public final class SupportSnackbar {
 
 	public SupportSnackbar setTextColor(int color) {
 		View view = snackbar.getView();
-		TextView tv = (TextView) view.findViewById(R.id.snackbar_text);
+		TextView tv = view.findViewById(R.id.snackbar_text);
 		tv.setTextColor(color);
 		return this;
 	}

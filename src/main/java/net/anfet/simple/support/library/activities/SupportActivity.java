@@ -53,7 +53,7 @@ public abstract  class SupportActivity<T extends ViewDataBinding, Z extends Pres
 	}
 
 	public Z getPresenter() {
-		return (Z) mPresenter;
+		return mPresenter;
 	}
 
 	@Override
